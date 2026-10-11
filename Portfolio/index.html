@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEON · CJavascript</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=28">
+</head>
+<body>
+  <!-- 2D fighter sprite template: human + cyborg variants (cloned twice per page arena by script.js) -->
+  <template id="fighter-tpl">
+    <svg class="sprite" viewBox="0 0 36 50" aria-hidden="true">
+      <ellipse class="shadow" cx="18" cy="48.6" rx="10" ry="1.7"/>
+      <g class="body">
+        <g class="leg leg-l">
+          <line class="limb" x1="15.5" y1="32" x2="13.6" y2="44.2"/>
+          <rect class="boot" x="10.2" y="43.8" width="7.2" height="5.2" rx="0.8"/>
+        </g>
+        <g class="leg leg-r">
+          <line class="limb" x1="20.5" y1="32" x2="22.4" y2="44.2"/>
+          <rect class="boot" x="18.6" y="43.8" width="7.2" height="5.2" rx="0.8"/>
+        </g>
+        <g class="arm arm-l">
+          <line class="limb" x1="12.5" y1="19" x2="9.4" y2="28.6"/>
+          <rect class="fist" x="6.9" y="29.4" width="5.2" height="5.2" rx="1.2"/>
+          <!-- three-sword style: blade held in the left hand (shown during Onigiri) -->
+          <g class="oni-blade oni-hand-l">
+            <line class="oni-steel" x1="9.4" y1="34" x2="9.4" y2="47.4"/>
+            <rect class="oni-guard" x="7.6" y="33.2" width="3.6" height="1.1" rx="0.5"/>
+          </g>
+        </g>
+        <g class="arm arm-r">
+          <line class="limb" x1="23.5" y1="19" x2="26.6" y2="28.6"/>
+          <rect class="fist" x="23.9" y="29.4" width="5.2" height="5.2" rx="1.2"/>
+          <!-- three-sword style: blade held in the right hand (shown during Onigiri) -->
+          <g class="oni-blade oni-hand-r">
+            <line class="oni-steel" x1="26.6" y1="34" x2="26.6" y2="47.4"/>
+            <rect class="oni-guard" x="24.8" y="33.2" width="3.6" height="1.1" rx="0.5"/>
+          </g>
+          <!-- randomized weapons: only the equipped one is shown (class on .sprite) -->
+          <g class="weapon weapon-katana">
+            <line class="w-blade" x1="27.8" y1="31.4" x2="34.8" y2="16.8"/>
+            <rect class="w-guard" x="25" y="30.4" width="4.6" height="1.3" rx="0.6"/>
+            <rect class="w-grip" x="26.3" y="31.8" width="1.5" height="3" rx="0.6"/>
+          </g>
+          <g class="weapon weapon-axe">
+            <line class="w-handle" x1="26.6" y1="33.2" x2="31.4" y2="13.8"/>
+            <path class="w-head" d="M31.4 12.8 L35.2 15 L33.6 20.2 L29.6 18.6 Z"/>
+          </g>
+          <g class="weapon weapon-hammer">
+            <line class="w-handle" x1="26.6" y1="33.2" x2="30.4" y2="16.4"/>
+            <rect class="w-head" x="26.4" y="12.4" width="8.4" height="5.4" rx="1.2"/>
+          </g>
+          <g class="weapon weapon-spear">
+            <line class="w-handle" x1="26.4" y1="33.6" x2="32.8" y2="9.6"/>
+            <path class="w-head" d="M32.8 8.8 L35 11.4 L32.8 12.6 L30.6 11.4 Z"/>
+          </g>
+          <g class="weapon weapon-staff">
+            <line class="w-handle" x1="26.6" y1="34" x2="31.2" y2="13.4"/>
+            <circle class="w-orb" cx="31.6" cy="11.2" r="2.5"/>
+          </g>
+          <g class="weapon weapon-claw">
+            <path class="w-claw" d="M29.6 29.6 L33.8 28.4 L30 31.4 Z"/>
+            <path class="w-claw" d="M29.8 31.6 L34.4 31.6 L30.2 33.6 Z"/>
+            <path class="w-claw" d="M29.6 33.6 L33.6 34.8 L29.6 35.6 Z"/>
+          </g>
+        </g>
+        <rect class="pad pad-l" x="10.7" y="16" width="4.4" height="4.8" rx="1.2"/>
+        <rect class="pad pad-r" x="20.9" y="16" width="4.4" height="4.8" rx="1.2"/>
+        <rect class="torso" x="12" y="16.6" width="12" height="14.6" rx="3.2"/>
+        <rect class="chest" x="15.8" y="19.4" width="4.4" height="4.6" rx="0.8"/>
+        <rect class="core" x="17.4" y="20.9" width="1.2" height="1.6" rx="0.3"/>
+        <rect class="belt" x="12" y="28.8" width="12" height="3" rx="0.8"/>
+        <g class="head">
+          <!-- human face -->
+          <g class="part-human">
+            <rect class="skull" x="13" y="3" width="10" height="11.8" rx="1.6"/>
+            <path class="hair" d="M12.5 6.6 Q11.9 2.2 18 2.2 Q24.1 2.2 23.5 6.6 L22.6 4.6 L18 4.4 L13.4 4.6 Z"/>
+            <path class="hair-ss" d="M12.5 8.4 L11.2 3.2 L14.2 5.4 L14.6 0.8 L17.8 4.4 L19.4 0.2 L21.8 4.4 L24.8 1.4 L23.6 8.4 Z"/>
+            <rect class="band" x="12.4" y="7.4" width="11.2" height="2.3" rx="0.7"/>
+            <path class="band-tail" d="M12.7 8.5 L7.4 12.2 L12 10.7 Z"/>
+            <rect class="eye" x="15.1" y="10.3" width="2" height="1.8" rx="0.4"/>
+            <rect class="eye" x="18.9" y="10.3" width="2" height="1.8" rx="0.4"/>
+            <!-- three-sword style: katana clenched in the mouth (shown during Onigiri) -->
+            <g class="oni-blade oni-mouth">
+              <line class="oni-steel" x1="18.4" y1="13.2" x2="31" y2="10.4"/>
+              <rect class="oni-guard" x="17.4" y="12.1" width="1.1" height="3.2" rx="0.4"/>
+            </g>
+          </g>
+          <!-- cyborg head -->
+          <g class="part-cyborg">
+            <polygon class="skull-metal" points="13.6,3.4 22.4,3.4 23.4,8.2 22,14.6 14,14.6 12.6,8.2"/>
+            <polygon class="helmet" points="12.6,4.2 23.4,4.2 22.4,8.4 13.6,8.4"/>
+            <rect class="cheek-l" x="12.5" y="8.8" width="1.7" height="3.6"/>
+            <rect class="cheek-r" x="21.8" y="8.8" width="1.7" height="3.6"/>
+            <rect class="visor" x="13.9" y="8.8" width="8.2" height="2.7" rx="0.6"/>
+            <path class="crest-ss" d="M13.2 7.6 L11.2 2.2 L14.4 4.6 L15.2 0.6 L18 4.2 L20.8 0.6 L21.8 4.6 L25 2.2 L23.6 7.6 Z"/>
+            <line class="antenna" x1="18" y1="3.6" x2="18" y2="0.8"/>
+            <circle class="antdot" cx="18" cy="0.9" r="1.1"/>
+            <rect class="jaw" x="15.6" y="12.6" width="4.8" height="2.1" rx="0.5"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </template>
+
+  <video class="video-background" autoplay loop muted playsinline>
+    <source src="video/BG.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
+
+  <div class="neon-card">
+
+    <div class="static-header">
+      <div class="brand">
+        <i class="fas fa-microchip"></i>
+        <h1><span class="cj">CJ</span><span class="avascript">avascript</span></h1>
+      </div>
+      <div class="tagline">
+        <i class="fas fa-bolt"></i> Dan - DV
+      </div>
+    </div>
+
+    <div class="dashboard-nav">
+      <button class="dash-btn active" data-page="landing"><i class="fas fa-home"></i> Home</button>
+      <button class="dash-btn" data-page="about"><i class="fas fa-user-astronaut"></i> About</button>
+      <button class="dash-btn" data-page="contact"><i class="fas fa-bolt"></i> Contact</button>
+      <button class="dash-btn" data-page="portfolio"><i class="fas fa-folder-open"></i> Portfolio</button>
+    </div>
+
+    <div class="dash-content">
+
+      <div id="landing" class="page active">
+        <div class="landing-content">
+          <div class="avatar-frame" id="avatarGlitch">
+            <img src="DP.jpg" alt="CJavascript">
+          </div>
+          <h1 class="glitch-text" id="glitchTitle">
+            <span class="cj">CJ</span><span class="avascript">avascript</span>
+          </h1>
+          <div class="subtitle"><i class="fas fa-code"></i> Front‑end Developer</div>
+          <p class="cta-text" id="ctaText">A Front-end student developer, with a little bit cyber on life.</p>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+      <div id="about" class="page">
+        <div class="about-minimal">
+          <div class="about-avatar">
+            <div class="avatar-frame-small">
+              <img src="DP.jpg" alt="CJavascript">
+            </div>
+          </div>
+          <div class="about-text">
+            <div class="about-header">
+              <h2>About me</h2>
+              <div class="about-buttons-horizontal">
+                <button class="about-btn" data-page="skills"><i class="fas fa-cogs"></i> Skills</button>
+                <button class="about-btn" data-page="achievements"><i class="fas fa-trophy"></i> Achievements</button>
+                <button class="about-btn" data-page="goals"><i class="fas fa-bullseye"></i> Goals</button>
+              </div>
+            </div>
+            <div class="role"><i class="fas fa-code"></i> Front‑end Developer</div>
+            <p>I'm CJavascript — a front‑end developer with a few projects under my belt. I craft clean, responsive interfaces. I'm 20 Years old a 3rd Year BSIT student of BatstateU - The NEU. I live at Poblacion Mabini Batangas. I'm A student full of hope and dignity when it comes to works/project.</p>
+            <div class="exp-tag"><i class="fas fa-calendar-alt"></i> Must Hire!!</div>
+          </div>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+      <div id="skills" class="page">
+        <div class="page-content with-buttons">
+          <div class="page-header">
+            <div class="page-title">
+              <h2><i class="fas fa-cogs" style="color:#00d4ff;"></i> My Skills</h2>
+              <p class="page-subtitle">Technologies and tools I work with</p>
+            </div>
+            <div class="page-buttons-horizontal">
+              <button class="about-btn" data-page="skills"><i class="fas fa-cogs"></i> Skills</button>
+              <button class="about-btn" data-page="achievements"><i class="fas fa-trophy"></i> Achievements</button>
+              <button class="about-btn" data-page="goals"><i class="fas fa-bullseye"></i> Goals</button>
+            </div>
+          </div>
+          <div class="skills-grid">
+            <span class="skill-tag">HTML</span>
+            <span class="skill-tag">CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">React</span>
+            <span class="skill-tag">Git</span>
+            <span class="skill-tag">Responsive Design</span>
+            <span class="skill-tag">UI/UX Basics</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">VS Code</span>
+          </div>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+      <div id="achievements" class="page">
+        <div class="page-content with-buttons">
+          <div class="page-header">
+            <div class="page-title">
+              <h2><i class="fas fa-trophy" style="color:#ff0080;"></i> School Achievements</h2>
+              <p class="page-subtitle">Recognition and accomplishments</p>
+            </div>
+            <div class="page-buttons-horizontal">
+              <button class="about-btn" data-page="skills"><i class="fas fa-cogs"></i> Skills</button>
+              <button class="about-btn" data-page="achievements"><i class="fas fa-trophy"></i> Achievements</button>
+              <button class="about-btn" data-page="goals"><i class="fas fa-bullseye"></i> Goals</button>
+            </div>
+          </div>
+          <ul class="achievement-list">
+            <li><i class="fas fa-award"></i> With Honors - Grade 11 1st &amp; 2nd Semester</li>
+            <li><i class="fas fa-award"></i> With Honors - Grade 12 1st &amp; 2nd Semester</li>
+            <li><i class="fas fa-trophy"></i> ICT Department President A.Y 2022-2023</li>
+            <li><i class="fas fa-medal"></i> Technical Committee A.Y 2024-2025, 2025-2026</li>
+            <li><i class="fas fa-star"></i> Business Manager 2 CICS School Organization Officer A.Y 2026-2027</li>
+            <li><i class="fas fa-star"></i> Committee on Finance, SSC School Organization Officer A.Y 2026-2027</li>
+            <li><i class="fas fa-award"></i> Dean's Lister - 1st Year, and 2nd Year</li>
+          </ul>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+      <div id="goals" class="page">
+        <div class="page-content with-buttons">
+          <div class="page-header">
+            <div class="page-title">
+              <h2><i class="fas fa-bullseye" style="color:#ff0080;"></i> My Goals</h2>
+              <p class="page-subtitle">What I'm working towards</p>
+            </div>
+            <div class="page-buttons-horizontal">
+              <button class="about-btn" data-page="skills"><i class="fas fa-cogs"></i> Skills</button>
+              <button class="about-btn" data-page="achievements"><i class="fas fa-trophy"></i> Achievements</button>
+              <button class="about-btn" data-page="goals"><i class="fas fa-bullseye"></i> Goals</button>
+            </div>
+          </div>
+          <ul class="goal-list">
+            <li><i class="fas fa-check-circle" style="color:#00d4ff;"></i> Become a Full-Stack Developer</li>
+            <li><i class="fas fa-check-circle" style="color:#00d4ff;"></i> Build a SaaS product</li>
+            <li><i class="fas fa-check-circle" style="color:#00d4ff;"></i> Master React &amp; Next.js</li>
+            <li><i class="fas fa-check-circle" style="color:#00d4ff;"></i> Contribute to Open Source</li>
+            <li><i class="fas fa-check-circle" style="color:#00d4ff;"></i> Land a remote developer job</li>
+            <li><i class="fas fa-check-circle" style="color:#00d4ff;"></i> Graduate with Latin Honors</li>
+          </ul>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+      <div id="contact" class="page">
+        <div class="contact-list">
+          <div class="contact-item"><i class="fas fa-envelope"></i><span>sandovaldan26@gmail.com</span><small>primary</small></div>
+          <div class="contact-item"><i class="fab fa-github"></i><span>github.com/Dan-progg</span><small>repos</small></div>
+          <div class="contact-item"><i class="fab fa-discord"></i><span>Philo#6588</span><small>discord</small></div>
+          <div class="contact-item"><i class="fab fa-instagram"></i><span>@cjoodid.nothin</span><small>instagram</small></div>
+          <div class="contact-item"><i class="fas fa-phone"></i><span>+63 919 3929 440</span><small>encrypted</small></div>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+      <div id="portfolio" class="page">
+        <div class="page-content">
+          <div class="page-header">
+            <div class="page-title">
+              <h2><i class="fas fa-folder-open" style="color:#00d4ff;"></i> My Portfolio</h2>
+            </div>
+          </div>
+          <div class="portfolio-grid">
+            <div class="blog-item">
+              <i class="fas fa-cart-shopping"></i>
+              <h4>Neon Forge</h4>
+              <p>Neon Forge is a cyberpunk-themed online PC shop where customers can browse and buy gaming gear like monitors, keyboards, mice, headphones, and system units.</p>
+              <a href="E-commerce/NeonForge.html" class="badge"><i class="fas fa-circle" style="color:#00d4ff; font-size: 0.5rem;"></i> NEON FORGE</a>
+            </div>
+            <div class="blog-item game-card" id="gameCard">
+              <i class="fas fa-motorcycle"></i>
+              <h4>NEON COURIER</h4>
+              <p>A fast-paced 2D cyberpunk platformer. Sprint, jump, and deliver the package before the clock runs out.</p>
+              <span class="badge"><i class="fas fa-circle" style="color:#00d4ff; font-size: 0.5rem;"></i> play now</span>
+            </div>
+          </div>
+        </div>
+        <div class="arena" aria-hidden="true"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="game-modal" id="gameModal">
+    <div class="game-window courier-window">
+      <div class="game-header">
+        <span><i class="fas fa-motorcycle"></i> NEON COURIER · PROTOTYPE</span>
+        <button class="game-close" id="gameClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="game-body">
+        <div class="game-stats">
+          <span>ELAPSED: <span id="traceBar">0.0s</span></span>
+          <span>PAR: <span id="parGoal">--</span></span>
+          <span>STATUS: <span id="gameScore">GRAB PACKAGE</span></span>
+          <span>LEVEL: <span id="gameLevel">1</span></span>
+          <span>SPEED: <span id="speedBar">★☆☆☆☆</span></span>
+          <span>CR: <span id="creditBar">0</span></span>
+        </div>
+        <canvas id="gameCanvas" width="720" height="360"></canvas>
+        <div class="game-message" id="gameMessage">> NEON COURIER ONLINE.<br>> USE <span style="color:#00d4ff;">← → / A D</span> TO RUN, <span style="color:#00d4ff;">SPACE / W / ↑</span> TO JUMP (TWICE IN THE AIR!).<br>> GRAB THE <span style="color:#ff0080;">PACKAGE</span>, REACH THE <span style="color:#00d4ff;">DROP ZONE</span>, AND TOUCH <span style="color:#00d4ff;">CHECKPOINT FLAGS</span> TO SAVE YOUR PROGRESS.</div>
+        <div class="game-controls">
+          <div class="move-hint"><i class="fas fa-arrow-left"></i><i class="fas fa-arrow-right"></i> move &nbsp;&nbsp; <i class="fas fa-arrow-up"></i> jump ×2 &nbsp;&nbsp; <i class="fas fa-flag"></i> checkpoint &nbsp;&nbsp; <i class="fas fa-redo"></i> R to restart</div>
+        </div>
+        <div class="game-footer">
+          <button class="game-start-btn" id="gameStartBtn"><i class="fas fa-play"></i> START RUN</button>
+          <button class="game-sound-btn" id="musicToggle" title="Toggle music" aria-label="Toggle music"><i class="fas fa-music"></i></button>
+          <button class="game-sound-btn" id="soundToggle" title="Toggle sound effects" aria-label="Toggle sound effects"><i class="fas fa-volume-up"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js?v=28"></script>
+</body>
+</html>

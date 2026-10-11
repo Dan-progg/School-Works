@@ -1,0 +1,1972 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Courier New', monospace;
+}
+
+body {
+  background: #0a0a0f;
+  color: #e0f2fe;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 15, 0.7);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.neon-card {
+  max-width: 1300px;
+  width: 100%;
+  background: rgba(13, 13, 26, 0.85);
+  backdrop-filter: blur(8px);
+  border: 2px solid #00d4ff;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.15), inset 0 0 20px rgba(0, 212, 255, 0.05);
+  padding: 2rem;
+  border-radius: 32px;
+  transition: box-shadow 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.neon-card:hover {
+  box-shadow: 0 0 50px rgba(0, 212, 255, 0.25), inset 0 0 30px rgba(0, 212, 255, 0.08);
+}
+
+.static-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #ff0080;
+  padding-bottom: 1.2rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.static-header::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30%;
+  height: 3px;
+  background: #ff0080;
+  filter: blur(6px);
+  animation: glitchLine 3s infinite;
+}
+
+@keyframes glitchLine {
+  0%, 100% { width: 30%; left: 0; }
+  50% { width: 60%; left: 20%; }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand i {
+  font-size: 2.4rem;
+  color: #00d4ff;
+  text-shadow: 0 0 12px #00d4ff;
+}
+
+.brand h1 {
+  font-weight: 700;
+  font-size: 2.4rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.brand h1 .cj {
+  color: #00d4ff;
+  text-shadow: 0 0 20px #00d4ff88;
+}
+
+.brand h1 .avascript {
+  color: #ff0080;
+  text-shadow: 0 0 20px #ff008088;
+}
+
+.tagline {
+  font-size: 1rem;
+  color: #7ec8e0;
+  background: rgba(255, 0, 128, 0.08);
+  padding: 0.4rem 1.2rem;
+  border-radius: 40px;
+  border: 1px solid #ff008055;
+  letter-spacing: 1.5px;
+  backdrop-filter: blur(4px);
+}
+
+.tagline i {
+  margin-right: 8px;
+  color: #ff0080;
+}
+
+.dashboard-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  background: rgba(18, 18, 31, 0.8);
+  padding: 0.6rem 1.5rem;
+  border-radius: 60px;
+  border: 1px solid #ff008055;
+  margin-bottom: 2rem;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.08);
+}
+
+.dash-btn {
+  background: transparent;
+  border: none;
+  color: #b0dcec;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+}
+
+.dash-btn i {
+  font-size: 1.1rem;
+  color: #00d4ff;
+  transition: 0.2s;
+}
+
+.dash-btn:hover {
+  background: #00d4ff22;
+  border-color: #ff0080aa;
+  color: #fff;
+  box-shadow: 0 0 20px #ff008033;
+  transform: translateY(-2px);
+}
+
+.dash-btn.active {
+  background: #ff008018;
+  border-color: #ff0080;
+  color: #ff0080;
+  box-shadow: 0 0 25px #ff008033;
+}
+
+.dash-btn.active i {
+  color: #ff0080;
+}
+
+.dash-content {
+  background: rgba(14, 14, 26, 0.8);
+  border-radius: 28px;
+  padding: 2rem 1.8rem;
+  border: 1px solid #1a1a2e;
+  min-height: 380px;
+  transition: all 0.2s;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  display: none;
+  animation: fadeGlitch 0.4s ease;
+}
+
+.page.active {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  position: relative;
+  /* the arena dips into the card's bottom padding so the fighters sit BELOW the
+     page text and never cover it; the arena clips its own contents */
+  overflow: visible;
+}
+
+/* ===== 2D fighter stage: two brawlers hugging the bottom of the card ===== */
+.arena {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: -60px; /* reach into the card's bottom padding */
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+}
+
+/* --- dash motion trail (behind each fighter) --- */
+.dash-trail {
+  position: absolute;
+  height: 12px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(0.5px);
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0) 0%, rgba(0, 212, 255, 0.9) 100%);
+}
+.dash-trail.rev {
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.9) 0%, rgba(0, 212, 255, 0) 100%);
+}
+.dash-trail.cyborg {
+  background: linear-gradient(90deg, rgba(255, 0, 128, 0) 0%, rgba(255, 0, 128, 0.9) 100%);
+}
+.dash-trail.cyborg.rev {
+  background: linear-gradient(90deg, rgba(255, 0, 128, 0.9) 0%, rgba(255, 0, 128, 0) 100%);
+}
+.dash-trail.active { opacity: 0.85; }
+.dash-trail.fire {
+  height: 16px;
+  filter: blur(1px);
+  opacity: 0.9;
+  animation: fireFlicker 0.12s steps(2) infinite;
+  background: linear-gradient(90deg, rgba(255, 150, 0, 0) 0%, rgba(255, 224, 96, 0.95) 55%, rgba(255, 90, 0, 0.9) 100%);
+}
+.dash-trail.fire.rev {
+  background: linear-gradient(90deg, rgba(255, 90, 0, 0.9) 0%, rgba(255, 224, 96, 0.95) 45%, rgba(255, 150, 0, 0) 100%);
+}
+
+/* --- character sprite --- */
+.sprite {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36px;
+  height: 50px;
+  overflow: visible;
+  will-change: transform;
+  z-index: 1;
+  shape-rendering: crispEdges; /* hard, pixel-art edges */
+  filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.45)) drop-shadow(0 4px 5px rgba(0, 0, 0, 0.5));
+}
+
+/* limb pivots, measured in the sprite's viewBox units */
+.sprite .arm-l { transform-box: view-box; transform-origin: 12.5px 19px; }
+.sprite .arm-r { transform-box: view-box; transform-origin: 23.5px 19px; }
+.sprite .leg-l { transform-box: view-box; transform-origin: 15.5px 32px; }
+.sprite .leg-r { transform-box: view-box; transform-origin: 20.5px 32px; }
+.sprite .body  { transform-box: view-box; transform-origin: 18px 47px; }
+.sprite .limb  { fill: none; }
+.sprite .shadow { fill: rgba(0, 0, 0, 0.45); }
+
+/* show either the human or the cyborg head */
+.sprite.human .part-cyborg { display: none; }
+.sprite.cyborg .part-human { display: none; }
+
+/* --- human palette (cyan neon) --- */
+.sprite.human .skull { fill: #f0c59a; }
+.sprite.human .hair { fill: #232a3d; }
+.sprite.human .band { fill: #ff0080; }
+.sprite.human .band-tail { fill: #ff0080; }
+.sprite.human .eye { fill: #0b0b14; }
+.sprite.human .torso { fill: #eef2fb; stroke: #ff0080; stroke-width: 1.4; }
+.sprite.human .belt { fill: #14141e; }
+.sprite.human .chest { fill: #00d4ff; }
+.sprite.human .arm .limb { stroke: #eeb488; stroke-width: 4.4; stroke-linecap: round; }
+.sprite.human .leg .limb { stroke: #1b2030; stroke-width: 5; stroke-linecap: round; }
+.sprite.human .fist { fill: #00d4ff; stroke: #ff0080; stroke-width: 1.2; }
+.sprite.human .boot { fill: #14141e; stroke: #00d4ff; stroke-width: 1.2; }
+.sprite.human .pad { fill: #d7e0f0; stroke: #ff0080; stroke-width: 1; }
+.sprite.human .core { fill: #00d4ff; }
+
+/* --- cyborg palette (magenta neon) --- */
+.sprite.cyborg .skull-metal { fill: #98a3b8; }
+.sprite.cyborg .helmet { fill: #2b3141; stroke: #00d4ff; stroke-width: 1.2; }
+.sprite.cyborg .visor { fill: #00d4ff; }
+.sprite.cyborg .antenna { stroke: #00d4ff; stroke-width: 1.2; stroke-linecap: round; }
+.sprite.cyborg .antdot { fill: #ff0080; }
+.sprite.cyborg .jaw { fill: #6b7688; }
+.sprite.cyborg .torso { fill: #3a4152; stroke: #00d4ff; stroke-width: 1.4; }
+.sprite.cyborg .belt { fill: #1b1f2a; }
+.sprite.cyborg .chest { fill: #ff0080; }
+.sprite.cyborg .arm .limb { stroke: #8b96ab; stroke-width: 4.4; stroke-linecap: round; }
+.sprite.cyborg .leg .limb { stroke: #39404f; stroke-width: 5; stroke-linecap: round; }
+.sprite.cyborg .fist { fill: #c3ccdd; stroke: #00d4ff; stroke-width: 1.2; }
+.sprite.cyborg .boot { fill: #2a2f3d; stroke: #ff0080; stroke-width: 1.2; }
+.sprite.cyborg .pad { fill: #4a5265; stroke: #00d4ff; stroke-width: 1; }
+.sprite.cyborg .core { fill: #ff0080; }
+.sprite.cyborg .cheek-l, .sprite.cyborg .cheek-r { fill: #6b7688; }
+
+/* --- idle breathing --- */
+.sprite .body { animation: fBodyIdle 2.6s ease-in-out infinite; }
+.sprite .arm-l { animation: fArmIdleL 2.6s ease-in-out infinite; }
+.sprite .arm-r { animation: fArmIdleR 2.6s ease-in-out infinite; }
+
+/* --- fighting stance: fast alternating one-two jab combo with a lunging bob --- */
+.sprite.fighting .body { animation: fBodyFight 0.6s ease-in-out infinite; }
+.sprite.fighting .leg-l { animation: none; transform: rotate(12deg); }
+.sprite.fighting .leg-r { animation: none; transform: rotate(-12deg); }
+.sprite.fighting .arm-l { animation: fJabL 0.6s ease-in-out infinite; }
+.sprite.fighting .arm-r { animation: fJabR 0.6s ease-in-out infinite; }
+
+/* --- running (roam): a real run cycle — legs drive, arms pump, body bobs --- */
+.sprite.running .body { animation: runBody 0.36s linear infinite; }
+.sprite.running .arm-l { animation: runArmL 0.36s linear infinite; }
+.sprite.running .arm-r { animation: runArmR 0.36s linear infinite; }
+.sprite.running .leg-l { animation: runLegL 0.36s linear infinite; }
+.sprite.running .leg-r { animation: runLegR 0.36s linear infinite; }
+
+/* --- super fire kick (dash attack) --- */
+.sprite.kicking .body { animation: kickBody 0.5s ease; }
+.sprite.kicking .arm-l { animation: none; transform: rotate(-28deg); }
+.sprite.kicking .arm-r { animation: none; transform: rotate(-150deg); }
+.sprite.kicking .leg-l { animation: none; transform: rotate(-16deg); }
+.sprite.kicking .leg-r { animation: kickLeg 0.5s ease; }
+
+/* --- casting a fireball (charge in both hands, then thrust forward) --- */
+.sprite.casting .body { animation: castBody 0.62s ease; }
+.sprite.casting .leg-l { animation: none; transform: rotate(13deg); }
+.sprite.casting .leg-r { animation: none; transform: rotate(-13deg); }
+.sprite.casting .arm-l { animation: none; transform: rotate(-122deg); }
+.sprite.casting .arm-r { animation: none; transform: rotate(-88deg); }
+
+/* --- rising uppercut: crouch, then launch a fist skyward --- */
+.sprite.uppercutting .body { animation: upperBody 0.56s ease; }
+.sprite.uppercutting .leg-l { animation: none; transform: rotate(16deg); }
+.sprite.uppercutting .leg-r { animation: none; transform: rotate(-16deg); }
+.sprite.uppercutting .arm-l { animation: none; transform: rotate(-52deg); }
+.sprite.uppercutting .arm-r { animation: upperArm 0.56s cubic-bezier(0.2, 0.8, 0.3, 1); }
+
+/* --- flying jump kick: leap and drive a leg forward --- */
+.sprite.jumpkicking .body { animation: jumpBody 0.68s ease; }
+.sprite.jumpkicking .arm-l { animation: none; transform: rotate(-30deg); }
+.sprite.jumpkicking .arm-r { animation: none; transform: rotate(-8deg); }
+.sprite.jumpkicking .leg-l { animation: none; transform: rotate(6deg); }
+.sprite.jumpkicking .leg-r { animation: jumpLeg 0.68s ease; }
+
+/* --- spinning backfist: wind up across the body, then whip it through --- */
+.sprite.hooking .body { animation: hookBody 0.52s ease; }
+.sprite.hooking .arm-l { animation: none; transform: rotate(-46deg); }
+.sprite.hooking .arm-r { animation: hookArm 0.52s cubic-bezier(0.3, 0, 0.4, 1); }
+.sprite.hooking .leg-l { animation: none; transform: rotate(14deg); }
+.sprite.hooking .leg-r { animation: none; transform: rotate(-14deg); }
+
+/* --- taking a hit --- */
+.sprite.hurt .body { animation: fHurt 0.18s ease-in-out; }
+.sprite.hurt .torso { stroke: #ffffff; }
+.sprite.hurt .helmet { stroke: #ffffff; }
+.sprite.hurt .visor { fill: #ffffff; }
+.sprite.hurt .skull, .sprite.hurt .skull-metal { fill: #ffffff; }
+
+/* --- knockout + victory poses --- */
+.sprite.ko .body { animation: koFall 0.5s cubic-bezier(0.4, 0, 0.7, 1) forwards; }
+.sprite.ko .arm-l { animation: none; transform: rotate(20deg); }
+.sprite.ko .arm-r { animation: none; transform: rotate(-20deg); }
+.sprite.win .body { animation: winHop 0.5s ease-in-out infinite; }
+.sprite.win .arm-l { animation: none; transform: rotate(168deg); }
+.sprite.win .arm-r { animation: none; transform: rotate(-168deg); }
+
+/* --- multi-hit combo flurry: rapid alternating strikes, no recovery gap --- */
+.sprite.combos .body { animation: comboBody 0.18s ease-in-out infinite; }
+.sprite.combos .leg-l { animation: none; transform: rotate(12deg); }
+.sprite.combos .leg-r { animation: none; transform: rotate(-12deg); }
+.sprite.combos .arm-l { animation: fJabL 0.18s ease-in-out infinite; }
+.sprite.combos .arm-r { animation: fJabR 0.18s ease-in-out infinite; }
+
+/* --- hyper rush: an unbroken blur of chained strikes --- */
+.sprite.rushing { filter: drop-shadow(0 0 6px rgba(255, 245, 150, 0.95)) brightness(1.1); }
+.sprite.rushing .body { animation: rushBody 0.12s ease-in-out infinite; }
+.sprite.rushing .leg-l { animation: none; transform: rotate(15deg); }
+.sprite.rushing .leg-r { animation: none; transform: rotate(-15deg); }
+.sprite.rushing .arm-l { animation: fJabL 0.1s ease-in-out infinite; }
+.sprite.rushing .arm-r { animation: fJabR 0.1s ease-in-out infinite; }
+
+/* --- evade roll: crouch down and spring back out of range --- */
+.sprite.dodging .body { animation: dodgeBody 0.42s ease; }
+.sprite.dodging .leg-l { animation: none; transform: rotate(30deg); }
+.sprite.dodging .leg-r { animation: none; transform: rotate(-30deg); }
+.sprite.dodging .arm-l { animation: none; transform: rotate(-22deg); }
+.sprite.dodging .arm-r { animation: none; transform: rotate(22deg); }
+
+/* --- kamehameha wind-up: cup both hands at the hip and gather energy --- */
+.sprite.kamecharge .body { animation: kameChargeBody 1s ease-in-out infinite; }
+.sprite.kamecharge .leg-l { animation: none; transform: rotate(20deg); }
+.sprite.kamecharge .leg-r { animation: none; transform: rotate(-20deg); }
+.sprite.kamecharge .arm-l { animation: kameChargeArm 1s ease-in-out infinite; }
+.sprite.kamecharge .arm-r { animation: kameChargeArmR 1s ease-in-out infinite; }
+
+/* --- kamehameha release: both palms punched forward --- */
+.sprite.kame .body { animation: kameBody 0.5s ease; }
+.sprite.kame .leg-l { animation: none; transform: rotate(22deg); }
+.sprite.kame .leg-r { animation: none; transform: rotate(-26deg); }
+.sprite.kame .arm-l { animation: none; transform: rotate(-90deg); }
+.sprite.kame .arm-r { animation: none; transform: rotate(-108deg); }
+
+/* --- rage surge: golden super-saiyan glow --- */
+.sprite.rage {
+  filter: drop-shadow(0 0 3px #fff2b0) drop-shadow(0 0 8px #ffd23f) drop-shadow(0 0 16px rgba(255, 170, 0, 0.85));
+}
+.sprite.rage .body { animation: rageBody 0.34s ease-in-out infinite; }
+.sprite.rage .hair { fill: #ffe14d; }
+.sprite.rage .band { fill: #ffb020; }
+.sprite.rage .band-tail { fill: #ffb020; }
+.sprite.rage .visor { fill: #ffe14d; }
+.sprite.rage .antdot { fill: #ffd23f; }
+.sprite.rage .chest, .sprite.rage .core { fill: #ffd23f; }
+
+/* --- launched: tumble helplessly through the air after a heavy hit --- */
+.sprite.launched .body { animation: airTumble 0.5s linear infinite; }
+
+/* --- randomized weapons: one equipped at a time, swapped every 8s --- */
+.sprite .weapon { display: none; }
+.sprite.weapon-katana .weapon-katana,
+.sprite.weapon-axe    .weapon-axe,
+.sprite.weapon-hammer .weapon-hammer,
+.sprite.weapon-spear  .weapon-spear,
+.sprite.weapon-staff  .weapon-staff,
+.sprite.weapon-claw   .weapon-claw { display: block; }
+.sprite .weapon .w-handle,
+.sprite .weapon .w-blade,
+.sprite .weapon .w-grip { fill: none; stroke-linecap: round; }
+
+/* katana: plasma-blue blade */
+.sprite .weapon-katana .w-blade { stroke: #9ff6ff; stroke-width: 1.5; filter: drop-shadow(0 0 2px #00d4ff); }
+.sprite .weapon-katana .w-guard { fill: #ff0080; }
+.sprite .weapon-katana .w-grip  { fill: #232a3d; }
+/* axe: neon magenta */
+.sprite .weapon-axe .w-handle { stroke: #6b7688; stroke-width: 1.6; }
+.sprite .weapon-axe .w-head { fill: #ff2b8f; stroke: #ffd23f; stroke-width: 0.8; filter: drop-shadow(0 0 2px #ff0080); }
+/* hammer: heavy yellow head */
+.sprite .weapon-hammer .w-handle { stroke: #8b96ab; stroke-width: 1.8; }
+.sprite .weapon-hammer .w-head { fill: #ffd23f; stroke: #ff8c1a; stroke-width: 1; filter: drop-shadow(0 0 2px #ffb020); }
+/* spear: long green arc */
+.sprite .weapon-spear .w-handle { stroke: #4a5265; stroke-width: 1.4; }
+.sprite .weapon-spear .w-head { fill: #6bffb0; stroke: #00d4ff; stroke-width: 0.8; filter: drop-shadow(0 0 2px #00ffa2); }
+/* staff: energy rod with a glowing orb */
+.sprite .weapon-staff .w-handle { stroke: #6b7688; stroke-width: 1.6; }
+.sprite .weapon-staff .w-orb { fill: #c58bff; stroke: #00d4ff; stroke-width: 0.8; filter: drop-shadow(0 0 3px #a259ff); }
+/* claw: three shock blades */
+.sprite .weapon-claw .w-claw { fill: #9ff6ff; stroke: #00d4ff; stroke-width: 0.5; filter: drop-shadow(0 0 2px #00d4ff); }
+
+/* a landed strike drives the weapon in an overhead arc (it rides the forearm) */
+.sprite.swinging .arm-r { animation: weaponSwing 0.28s cubic-bezier(0.2, 0.8, 0.3, 1); }
+
+/* brief pop when a new weapon materializes in hand */
+.sprite.weapon-swap { animation: weaponSwap 0.34s ease-out; }
+
+/* --- three-sword style: PURGATORY ONIGIRI (Kai's signature) --- */
+/* the third blade sits in the mouth, so mask it to the human head only */
+.sprite .oni-blade { display: none; }
+.sprite.onigi .oni-blade,
+.sprite.onigi-slash .oni-blade { display: block; }
+/* the three swords replace whatever single weapon was equipped */
+.sprite.onigi .weapon,
+.sprite.onigi-slash .weapon { display: none; }
+.sprite .oni-blade .oni-steel {
+  fill: none;
+  stroke: #eafcff;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2px #bff6ff) drop-shadow(0 0 4px #ff2b2b);
+}
+.sprite .oni-blade .oni-guard { fill: #ff2b2b; stroke: #14141e; stroke-width: 0.4; }
+
+/* santoryu aura: a sickly green battle-aura, then the blitz */
+.sprite.onigi,
+.sprite.onigi-slash {
+  filter: drop-shadow(0 0 3px #b6ffcf) drop-shadow(0 0 9px rgba(0, 255, 128, 0.75)) drop-shadow(0 0 18px rgba(0, 170, 90, 0.55));
+}
+/* wind-up: blades crossed at the chest, coiled and trembling */
+.sprite.onigi .body { animation: onigiWind 0.46s ease-in-out; }
+.sprite.onigi .leg-l { animation: none; transform: rotate(16deg); }
+.sprite.onigi .leg-r { animation: none; transform: rotate(-16deg); }
+.sprite.onigi .arm-l { animation: none; transform: rotate(-46deg); }
+.sprite.onigi .arm-r { animation: none; transform: rotate(46deg); }
+/* stance: all three blades drawn wide, aura screaming, a coiled pause before the strike */
+.sprite.onigi-stance {
+  filter: drop-shadow(0 0 4px #d8ffe6) drop-shadow(0 0 13px rgba(0, 255, 128, 0.85)) drop-shadow(0 0 27px rgba(0, 170, 90, 0.65));
+}
+.sprite.onigi-stance .body { animation: onigiStance 0.42s ease-in-out infinite; }
+.sprite.onigi-stance .leg-l { animation: none; transform: rotate(20deg); }
+.sprite.onigi-stance .leg-r { animation: none; transform: rotate(-20deg); }
+.sprite.onigi-stance .arm-l { animation: none; transform: rotate(70deg); }
+.sprite.onigi-stance .arm-r { animation: none; transform: rotate(-70deg); }
+/* sheathe: after the dash-through, blades flung wide */
+.sprite.onigi-slash .body { animation: onigiSchool 0.5s ease-out; }
+.sprite.onigi-slash .leg-l { animation: none; transform: rotate(22deg); }
+.sprite.onigi-slash .leg-r { animation: none; transform: rotate(-22deg); }
+.sprite.onigi-slash .arm-l { animation: none; transform: rotate(-74deg); }
+.sprite.onigi-slash .arm-r { animation: none; transform: rotate(74deg); }
+
+/* horizontal blitz streak as Kai crosses through the foe */
+.sf-blitz {
+  position: absolute;
+  width: 130px;
+  height: 12px;
+  margin: -6px 0 0 -65px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #eafcff 22%, #ff2b2b 56%, #ffffff 82%, rgba(255,255,255,0));
+  box-shadow: 0 0 12px #ff2b2b, 0 0 22px rgba(120, 255, 160, 0.6);
+  animation: blitzStreak 0.34s ease-out;
+}
+
+/* the cross (X) carved into the foe by the three blades */
+.sf-onigi {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,60,60,0.42) 28%, rgba(140,0,0,0) 66%);
+}
+.sf-onigi::before,
+.sf-onigi::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 156px;
+  height: 8px;
+  margin: -4px 0 0 -78px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #ffffff 18%, #ff2b2b 48%, #ffffff 82%, rgba(255,255,255,0));
+  box-shadow: 0 0 10px #ff2b2b, 0 0 22px rgba(255, 0, 0, 0.75), 0 0 30px rgba(120, 255, 160, 0.5);
+}
+.sf-onigi::before { transform: rotate(40deg); }
+.sf-onigi::after  { transform: rotate(-40deg); }
+.sf-onigi.show { animation: onigiCross 0.62s ease-out; }
+.sf-onigi.slow.show { animation: onigiCrossSlow 1.15s ease-out; }   /* lingering scar */
+
+/* ---- UNIT-7's signature: GALAXY IMPACT — a Haki-charged ground smash ---- */
+.sprite.galaxy {
+  filter: drop-shadow(0 0 4px #ffd76a) drop-shadow(0 0 13px rgba(255, 190, 60, 0.75)) drop-shadow(0 0 24px rgba(52, 0, 74, 0.75));
+}
+/* charge: fist raised overhead, Haki gathering */
+.sprite.galaxy .arm-l { animation: none; transform: rotate(-30deg); }
+.sprite.galaxy .arm-r { animation: none; transform: rotate(200deg); }
+.sprite.galaxy .leg-l { animation: none; transform: rotate(10deg); }
+.sprite.galaxy .leg-r { animation: none; transform: rotate(-14deg); }
+.sprite.galaxy .body { animation: galaxyCharge 0.5s ease-in-out; }
+/* smash: fist driven into the ground */
+.sprite.galaxy-hit .arm-l { animation: none; transform: rotate(-52deg); }
+.sprite.galaxy-hit .arm-r { animation: none; transform: rotate(-26deg); }
+.sprite.galaxy-hit .leg-l { animation: none; transform: rotate(18deg); }
+.sprite.galaxy-hit .leg-r { animation: none; transform: rotate(-20deg); }
+.sprite.galaxy-hit .body { animation: galaxySmash 0.42s cubic-bezier(.3, .7, .4, 1); }
+
+/* the detonation at the point of impact */
+.sf-galaxy {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  margin: -45px 0 0 -45px;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #ffd76a 24%, rgba(255, 120, 0, 0.5) 50%, rgba(20, 0, 30, 0) 72%);
+  box-shadow: 0 0 30px #ffb43c, 0 0 62px rgba(255, 180, 60, 0.6);
+}
+.sf-galaxy::before,
+.sf-galaxy::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 70px;
+  margin: -35px 0 0 -130px;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 214, 106, 0.9);
+  box-shadow: 0 0 18px rgba(255, 180, 60, 0.8), 0 0 26px rgba(255, 180, 60, 0.6);
+  transform: scale(0.15);
+  opacity: 0;
+}
+.sf-galaxy::after { border-color: rgba(180, 120, 255, 0.85); box-shadow: 0 0 18px rgba(150, 80, 255, 0.75); }
+.sf-galaxy.show { animation: galaxyPop 0.82s ease-out; }
+.sf-galaxy.show::before { animation: galaxyRing 0.72s ease-out; }
+.sf-galaxy.show::after { animation: galaxyRing 0.72s 0.1s ease-out; }
+
+/* conqueror's black lightning fanning out of the impact */
+.sf-bolt {
+  position: absolute;
+  width: 11px;
+  height: 132px;
+  margin: -132px 0 0 -5px;
+  pointer-events: none;
+  z-index: 6;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--rot, 0deg));
+  clip-path: polygon(45% 0%, 100% 28%, 62% 44%, 94% 62%, 40% 100%, 50% 60%, 12% 40%, 55% 26%);
+  background: linear-gradient(180deg, #6a1fd6 0%, #150022 44%, #b06bff 70%, #ffffff 100%);
+  filter: drop-shadow(0 0 6px #9b4dff) drop-shadow(0 0 12px #ffd76a);
+  opacity: 0;
+  animation: boltFlash 0.52s ease-out forwards;
+}
+
+.punch-spark {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #00d4ff 32%, rgba(0, 212, 255, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.punch-spark.super {
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  background: radial-gradient(circle, #ffffff 0%, #ffe066 24%, #ff8c1a 46%, rgba(255, 96, 0, 0) 72%);
+}
+.punch-spark.show { animation: sparkPop 0.26s ease-out; }
+.punch-spark.super.show { animation: sparkPop 0.42s ease-out; }
+
+/* --- fireball charging orb (held in the fighter's hands) --- */
+.sf-charge {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transform: translate(-50%, -50%) scale(0.3);
+  transition: opacity 0.1s ease;
+  background: radial-gradient(circle, #ffffff 0%, #ffe066 30%, #ff8c1a 60%, rgba(255, 96, 0, 0) 78%);
+  box-shadow: 0 0 14px 3px rgba(255, 170, 40, 0.8), 0 0 30px 8px rgba(255, 90, 0, 0.4);
+}
+.sf-charge.show { animation: chargePulse 0.24s ease-in-out infinite; }
+.sf-charge.kame {
+  background: radial-gradient(circle, #ffffff 0%, rgba(150, 240, 255, 0.95) 30%, rgba(0, 170, 255, 0.85) 58%, rgba(0, 120, 255, 0) 78%);
+  box-shadow: 0 0 16px 5px rgba(120, 220, 255, 0.85), 0 0 34px 12px rgba(0, 150, 255, 0.5);
+}
+
+/* --- travelling fireball --- */
+.sf-shot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(circle, #ffffff 0%, #ffe066 28%, #ff8c1a 55%, rgba(255, 96, 0, 0) 78%);
+  box-shadow: 0 0 14px 4px rgba(255, 170, 40, 0.85), 0 0 28px 9px rgba(255, 90, 0, 0.45);
+  animation: shotFlicker 0.12s steps(2) infinite;
+}
+.sf-shot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 80%;
+  width: 30px;
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, rgba(255, 150, 0, 0), rgba(255, 200, 70, 0.9));
+  filter: blur(1px);
+}
+.sf-shot.rev::after {
+  right: auto;
+  left: 80%;
+  background: linear-gradient(90deg, rgba(255, 200, 70, 0.9), rgba(255, 150, 0, 0));
+}
+
+/* --- super-saiyan energy aura that flares behind a raging fighter --- */
+.sf-aura {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 56px;
+  height: 80px;
+  margin: 0;
+  transform: translate(-50%, -50%) scale(0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(50% 50% at 50% 58%, rgba(255, 248, 200, 0.9) 0%, rgba(255, 209, 63, 0.55) 40%, rgba(255, 140, 0, 0) 72%);
+}
+.sf-aura.show {
+  opacity: 0.95;
+  animation: auraFlare 0.42s ease-in-out infinite alternate;
+}
+.sf-aura.cyborg {
+  background: radial-gradient(50% 50% at 50% 58%, rgba(255, 225, 255, 0.85) 0%, rgba(255, 0, 128, 0.5) 42%, rgba(160, 0, 90, 0) 72%);
+}
+
+/* --- kamehameha beam: a long charged energy column --- */
+.sf-beam {
+  position: absolute;
+  height: 15px;
+  width: 1400px;
+  margin-top: -7.5px;
+  transform-origin: left center;
+  transform: scaleX(1);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(150, 240, 255, 0.95) 12%, rgba(0, 200, 255, 0.9) 42%, rgba(0, 120, 255, 0.35) 78%, rgba(0, 80, 255, 0) 100%);
+  box-shadow: 0 0 14px 3px rgba(120, 220, 255, 0.85), 0 0 30px 10px rgba(0, 150, 255, 0.5);
+  animation: beamGrow 0.1s ease-out, beamFlicker 0.1s steps(2) infinite;
+}
+.sf-beam.rev { transform-origin: right center; }
+
+/* --- floating name + health bar that hovers ABOVE each fighter --- */
+.sf-hud {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 66px;
+  transform: translate(-50%, -100%);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+  z-index: 4;
+}
+.sf-hud.show { opacity: 1; }
+.sf-name {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #00d4ff;
+  text-shadow: 0 0 8px currentColor;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.sf-hud.cyborg .sf-name { color: #ff0080; }
+/* endless mode: the life gauge is hidden — damage still drives rage + second wind.
+   To show the bars again, delete the display:none below. */
+.sf-bar {
+  display: none;
+  height: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+.sf-hud.cyborg .sf-bar { box-shadow: 0 0 10px rgba(255, 0, 128, 0.3); }
+.sf-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: center;
+  transition: transform 0.18s ease-out;
+  background: linear-gradient(180deg, #7dfcff, #00d4ff 58%, #0089b8);
+}
+.sf-hud.cyborg .sf-fill {
+  background: linear-gradient(180deg, #ff8ac2, #ff0080 58%, #b00059);
+}
+.sf-fill.low,
+.sf-hud.cyborg .sf-fill.low {
+  background: linear-gradient(180deg, #ffd0d0, #ff2b2b 58%, #a80000);
+}
+
+/* --- ROUND / FIGHT / K.O. banner --- */
+.sf-announce {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34%;
+  text-align: center;
+  font-size: clamp(1.1rem, 4.4vw, 2rem);
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 3px;
+  color: #ffffff;
+  text-shadow: 0 0 10px #00d4ff, 0 0 22px #00d4ff, 2px 3px 0 #ff0080;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.sf-announce.show { animation: announcePop 1.05s ease-out; }
+
+@keyframes fBodyIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
+@keyframes fArmIdleL { 0%, 100% { transform: rotate(3deg); } 50% { transform: rotate(-3deg); } }
+@keyframes fArmIdleR { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+/* run cycle: legs drive fore/aft, arms pump in opposition, body bobs + leans in */
+@keyframes runBody {
+  0%, 100% { transform: translateY(0) rotate(9deg); }
+  50%      { transform: translateY(-1.6px) rotate(9deg); }
+}
+@keyframes runLegL {
+  0%   { transform: rotate(36deg); }
+  50%  { transform: rotate(-30deg); }
+  100% { transform: rotate(36deg); }
+}
+@keyframes runLegR {
+  0%   { transform: rotate(-30deg); }
+  50%  { transform: rotate(36deg); }
+  100% { transform: rotate(-30deg); }
+}
+@keyframes runArmL {
+  0%   { transform: rotate(-34deg); }
+  50%  { transform: rotate(38deg); }
+  100% { transform: rotate(-34deg); }
+}
+@keyframes runArmR {
+  0%   { transform: rotate(38deg); }
+  50%  { transform: rotate(-34deg); }
+  100% { transform: rotate(38deg); }
+}
+
+@keyframes fBodyFight {
+  0%   { transform: translateX(0) rotate(0deg); }
+  12%  { transform: translateX(2.6px) rotate(-3deg); }   /* lunge with the lead jab */
+  22%  { transform: translateX(0) rotate(0deg); }
+  38%  { transform: translateX(2.6px) rotate(3deg); }    /* lunge with the cross */
+  48%  { transform: translateX(0) rotate(0deg); }
+  64%  { transform: translateX(3.4px) rotate(-3.6deg); } /* deeper step-in */
+  76%  { transform: translateX(0) rotate(0deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+@keyframes fJabL {
+  0%   { transform: rotate(-38deg) translate(0, 0); }
+  12%  { transform: rotate(-88deg) translate(3px, -1px); }
+  20%  { transform: rotate(-88deg) translate(3px, -1px); }
+  30%  { transform: rotate(-38deg) translate(0, 0); }
+  100% { transform: rotate(-38deg) translate(0, 0); }
+}
+@keyframes fJabR {
+  0%   { transform: rotate(38deg) translate(0, 0); }
+  38%  { transform: rotate(38deg) translate(0, 0); }
+  50%  { transform: rotate(-38deg) translate(3px, -1px); } /* straight cross */
+  58%  { transform: rotate(-38deg) translate(3px, -1px); }
+  68%  { transform: rotate(38deg) translate(0, 0); }
+  100% { transform: rotate(38deg) translate(0, 0); }
+}
+@keyframes fHurt {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-1.6px) rotate(-3deg); }
+  60% { transform: translateX(1px) rotate(2deg); }
+  100% { transform: translateX(0); }
+}
+@keyframes koFall {
+  0% { transform: rotate(0deg) translateY(0); }
+  100% { transform: rotate(80deg) translateY(-1px); }
+}
+@keyframes winHop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes kickBody {
+  0%, 100% { transform: rotate(0deg); }
+  45% { transform: rotate(-7deg); }
+}
+@keyframes kickLeg {
+  0% { transform: rotate(-9deg); }
+  35% { transform: rotate(-96deg); }
+  60% { transform: rotate(-96deg); }
+  100% { transform: rotate(-9deg); }
+}
+@keyframes upperBody {
+  0%   { transform: translateY(0) rotate(0deg); }
+  16%  { transform: translateY(2px) rotate(-5deg); }   /* crouch + load */
+  46%  { transform: translateY(-2.5px) rotate(4deg); } /* spring up into it */
+  70%  { transform: translateY(-1px) rotate(2deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+@keyframes upperArm {
+  0%   { transform: rotate(46deg); }    /* fist cocked low */
+  20%  { transform: rotate(64deg); }
+  48%  { transform: rotate(-152deg); }  /* launch skyward */
+  64%  { transform: rotate(-152deg); }
+  100% { transform: rotate(-152deg); }
+}
+@keyframes jumpBody {
+  0%   { transform: rotate(4deg); }
+  32%  { transform: rotate(24deg); }    /* drive forward through the kick */
+  62%  { transform: rotate(24deg); }
+  100% { transform: rotate(4deg); }
+}
+@keyframes jumpLeg {
+  0%   { transform: rotate(-8deg); }
+  30%  { transform: rotate(-96deg); }   /* leg snaps out */
+  64%  { transform: rotate(-96deg); }
+  100% { transform: rotate(-8deg); }
+}
+@keyframes hookBody {
+  0%   { transform: rotate(0deg); }
+  22%  { transform: rotate(-18deg); }   /* wind up */
+  52%  { transform: rotate(22deg); }    /* whip the body through */
+  74%  { transform: rotate(14deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes hookArm {
+  0%   { transform: rotate(78deg); }    /* arm tucked across the chest */
+  22%  { transform: rotate(104deg); }
+  50%  { transform: rotate(-72deg); }   /* swing across the foe */
+  70%  { transform: rotate(-60deg); }
+  100% { transform: rotate(-60deg); }
+}
+@keyframes fireFlicker {
+  0% { opacity: 0.72; }
+  100% { opacity: 1; }
+}
+@keyframes castBody {
+  0% { transform: translateY(0) rotate(0deg); }
+  22% { transform: translateY(-1px) rotate(-2deg); }
+  58% { transform: translateY(0) rotate(3deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+@keyframes chargePulse {
+  0%, 100% { box-shadow: 0 0 12px 3px rgba(255, 170, 40, 0.7), 0 0 26px 7px rgba(255, 90, 0, 0.35); }
+  50% { box-shadow: 0 0 18px 5px rgba(255, 200, 80, 0.9), 0 0 34px 11px rgba(255, 90, 0, 0.5); }
+}
+@keyframes shotFlicker {
+  0% { filter: brightness(1); }
+  100% { filter: brightness(1.35); }
+}
+@keyframes announcePop {
+  0% { transform: scale(0.55); opacity: 0; }
+  14% { transform: scale(1.14); opacity: 1; }
+  26% { transform: scale(1); opacity: 1; }
+  72% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+@keyframes sparkPop {
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes comboBody {
+  0%   { transform: translateX(0) rotate(0deg); }
+  25%  { transform: translateX(3px) rotate(-4deg); }
+  50%  { transform: translateX(0) rotate(0deg); }
+  75%  { transform: translateX(3px) rotate(4deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+@keyframes rushBody {
+  0%   { transform: translateX(0) rotate(0deg); }
+  50%  { transform: translateX(4.5px) rotate(2.5deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+@keyframes weaponSwing {
+  0%   { transform: rotate(-14deg); }
+  45%  { transform: rotate(64deg); }
+  70%  { transform: rotate(34deg); }
+  100% { transform: rotate(44deg); }
+}
+@keyframes weaponSwap {
+  0%   { filter: brightness(1.9) drop-shadow(0 0 7px rgba(255, 245, 150, 0.95)); }
+  100% { filter: brightness(1) drop-shadow(0 0 3px rgba(0, 212, 255, 0.45)) drop-shadow(0 4px 5px rgba(0, 0, 0, 0.5)); }
+}
+@keyframes onigiWind {
+  0%   { transform: translateX(-4px) rotate(-7deg); }
+  30%  { transform: translateX(3px) rotate(5deg); }
+  55%  { transform: translateX(-3px) rotate(-4deg); }
+  80%  { transform: translateX(2px) rotate(3deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+@keyframes onigiSchool {
+  0%   { transform: translateX(0) rotate(0deg) scale(1.07); }
+  55%  { transform: translateX(-3px) rotate(-6deg) scale(1.02); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); }
+}
+@keyframes blitzStreak {
+  0%   { opacity: 0; transform: scaleX(0.3); }
+  25%  { opacity: 1; transform: scaleX(1.1); }
+  100% { opacity: 0; transform: scaleX(1.5) translateX(24px); }
+}
+@keyframes onigiCross {
+  0%   { opacity: 0; transform: scale(0.3) rotate(-24deg); }
+  22%  { opacity: 1; transform: scale(1.06) rotate(0deg); }
+  68%  { opacity: 0.92; transform: scale(1.12) rotate(5deg); }
+  100% { opacity: 0; transform: scale(1.22) rotate(9deg); }
+}
+@keyframes onigiCrossSlow {
+  0%   { opacity: 0; transform: scale(0.3) rotate(-24deg); }
+  20%  { opacity: 1; transform: scale(1) rotate(0deg); }
+  70%  { opacity: 0.85; transform: scale(1.12) rotate(4deg); }
+  100% { opacity: 0; transform: scale(1.7) rotate(8deg); }
+}
+@keyframes onigiStance {
+  0%   { transform: translateX(0) rotate(0deg) scale(1); }
+  50%  { transform: translateX(0) rotate(0deg) scale(1.04); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); }
+}
+@keyframes galaxyCharge {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); }
+  40%  { transform: translateY(-1px) rotate(-3deg) scale(1.05); }
+  70%  { transform: translateY(-2px) rotate(2deg) scale(1.08); }
+  100% { transform: translateY(0) rotate(0deg) scale(1.1); }
+}
+@keyframes galaxyDive {
+  0%   { transform: translateX(-2px) rotate(-8deg) scale(1.06); }
+  100% { transform: translateX(3px) rotate(16deg) scale(1.02); }
+}
+@keyframes galaxySmash {
+  0%   { transform: translateX(-4px) rotate(-6deg) scale(1.08); }
+  30%  { transform: translateX(3px) rotate(14deg) scale(1.02); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); }
+}
+@keyframes galaxyPop {
+  0%   { opacity: 0; transform: scale(0.2); }
+  18%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+@keyframes galaxyRing {
+  0%   { opacity: 0; transform: scale(0.12); }
+  20%  { opacity: 1; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+@keyframes boltFlash {
+  0%   { opacity: 0; }
+  14%  { opacity: 1; }
+  60%  { opacity: 0.75; }
+  100% { opacity: 0; }
+}
+@keyframes dodgeBody {
+  0%   { transform: translateY(0) rotate(0deg) scaleY(1); }
+  30%  { transform: translateY(3px) rotate(-16deg) scaleY(0.86); }
+  62%  { transform: translateY(1px) rotate(-26deg) scaleY(0.92); }
+  100% { transform: translateY(0) rotate(0deg) scaleY(1); }
+}
+@keyframes kameChargeBody {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(1.5px) rotate(-11deg); }
+}
+@keyframes kameChargeArm {
+  0%, 100% { transform: rotate(62deg); }
+  50%      { transform: rotate(80deg); }
+}
+@keyframes kameChargeArmR {
+  0%, 100% { transform: rotate(98deg); }
+  50%      { transform: rotate(82deg); }
+}
+@keyframes kameBody {
+  0%   { transform: rotate(-8deg) translateX(-3px); }   /* load back */
+  30%  { transform: rotate(6deg) translateX(2px); }     /* punch forward */
+  60%  { transform: rotate(4deg) translateX(1px); }
+  100% { transform: rotate(-8deg) translateX(-3px); }
+}
+@keyframes rageBody {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-1px) scaleY(1.03); }
+}
+@keyframes airTumble {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes auraFlare {
+  0%   { transform: translate(-50%, -50%) scale(0.84); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(1.16); opacity: 1; }
+}
+@keyframes beamGrow {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+@keyframes beamFlicker {
+  0%   { opacity: 0.82; filter: brightness(1.1); }
+  100% { opacity: 1; filter: brightness(1.5); }
+}
+
+/* --- super saiyan: spiked gold hair / energy crest replace the normal cut --- */
+.sprite .hair-ss  { display: none; }
+.sprite .crest-ss { display: none; }
+.sprite.rage .hair { opacity: 0; }
+.sprite.rage .hair-ss {
+  display: block;
+  fill: #ffe14d;
+  stroke: #fff7c0;
+  stroke-width: 0.4;
+}
+.sprite.rage .crest-ss {
+  display: block;
+  fill: #ffe14d;
+  stroke: #fff7c0;
+  stroke-width: 0.4;
+  filter: drop-shadow(0 0 2px #ffd93b);
+}
+.sprite.rage .eye { fill: #8ffcff; }
+
+/* the aura gets a rising flame tongue for a proper power-up */
+.sf-aura::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 26%;
+  width: 42%;
+  height: 96%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 42% 42% / 62% 62% 40% 40%;
+  background: linear-gradient(0deg, rgba(255, 210, 70, 0) 0%, rgba(255, 232, 130, 0.5) 42%, rgba(255, 255, 225, 0.9) 78%, rgba(255, 255, 255, 0) 100%);
+  filter: blur(2px);
+  animation: auraFlame 0.4s ease-in-out infinite alternate;
+}
+
+/* --- aerial hover while casting a fireball / kamehameha from the air --- */
+.sprite.flying .body { animation: flyBob 0.55s ease-in-out infinite; }
+.sprite.flying .leg-l { animation: none; transform: rotate(26deg); }
+.sprite.flying .leg-r { animation: none; transform: rotate(-22deg); }
+
+/* --- galaxy dive: pitched forward, fist thrust down as UNIT-7 plummets --- */
+.sprite.galaxy-dive .body { animation: galaxyDive 0.3s ease-in forwards; }
+.sprite.galaxy-dive .arm-l { animation: none; transform: rotate(-58deg); }
+.sprite.galaxy-dive .arm-r { animation: none; transform: rotate(-14deg); }
+.sprite.galaxy-dive .leg-l { animation: none; transform: rotate(44deg); }
+.sprite.galaxy-dive .leg-r { animation: none; transform: rotate(-40deg); }
+
+/* --- instant transmission: a blur lunge that lands the instant it arrives --- */
+.sprite.warping { filter: drop-shadow(0 0 7px rgba(190, 240, 255, 0.95)); }
+.sprite.warping .body { animation: warpBody 0.36s ease-out; }
+.sprite.warping .arm-l { animation: none; transform: rotate(-40deg); }
+.sprite.warping .arm-r { animation: warpArm 0.36s cubic-bezier(0.2, 0.9, 0.2, 1); }
+.sprite.warping .leg-l { animation: none; transform: rotate(28deg); }
+.sprite.warping .leg-r { animation: none; transform: rotate(-34deg); }
+
+/* --- super-strength haymaker: huge wind-up then a shattering swing --- */
+.sprite.heavy .body { animation: heavyBody 0.62s ease; }
+.sprite.heavy .arm-l { animation: none; transform: rotate(-30deg); }
+.sprite.heavy .arm-r { animation: heavyArm 0.62s cubic-bezier(0.25, 0, 0.25, 1); }
+.sprite.heavy .leg-l { animation: none; transform: rotate(18deg); }
+.sprite.heavy .leg-r { animation: none; transform: rotate(-18deg); }
+
+/* --- full-stage screen flash (transformations + instant transmission) --- */
+.sf-flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 6;
+  background: radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.95) 0%, rgba(190, 240, 255, 0.55) 40%, rgba(190, 240, 255, 0) 75%);
+}
+.sf-flash.gold {
+  background: radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 225, 80, 0.6) 42%, rgba(255, 180, 0, 0) 76%);
+}
+.sf-flash.show { animation: flashPop 0.42s ease-out; }
+
+/* --- shockwave ring (power-up burst / heavy impact) --- */
+.sf-burst {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 18px 4px rgba(255, 210, 70, 0.8);
+  pointer-events: none;
+  z-index: 5;
+  animation: burstRing 0.64s ease-out forwards;
+}
+.sf-burst.ground {
+  border-color: rgba(160, 240, 255, 0.9);
+  box-shadow: 0 0 22px 6px rgba(0, 180, 255, 0.7);
+}
+
+/* --- instant-transmission vanish / arrive streak --- */
+.sf-warp {
+  position: absolute;
+  width: 12px;
+  height: 64px;
+  margin: -32px 0 0 -6px;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(210, 245, 255, 0.95) 30%, rgba(120, 220, 255, 0.95) 55%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: 0 0 16px 4px rgba(140, 230, 255, 0.8);
+  animation: warpStreak 0.32s ease-out forwards;
+}
+
+/* --- glowing floor crack left by a super-strength sledge --- */
+.sf-crack {
+  position: absolute;
+  width: 48px;
+  height: 18px;
+  margin: -16px 0 0 -24px;
+  pointer-events: none;
+  z-index: 4;
+  background:
+    linear-gradient(115deg, transparent 46%, rgba(0, 212, 255, 0.9) 47%, rgba(0, 212, 255, 0.9) 50%, transparent 51%) center / 100% 100% no-repeat,
+    linear-gradient(65deg, transparent 46%, rgba(255, 0, 128, 0.85) 47%, rgba(255, 0, 128, 0.85) 50%, transparent 51%) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.7));
+  animation: crackFade 0.64s ease-out forwards;
+}
+
+@keyframes flyBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-2.4px) rotate(-1deg); }
+}
+@keyframes warpBody {
+  0%   { transform: scaleX(0.6) translateX(-4px); opacity: 0.2; }
+  35%  { transform: scaleX(1.06) translateX(3px); opacity: 1; }
+  100% { transform: scaleX(1) translateX(0); opacity: 1; }
+}
+@keyframes warpArm {
+  0%   { transform: rotate(-150deg); }
+  55%  { transform: rotate(-10deg); }
+  100% { transform: rotate(-10deg); }
+}
+@keyframes heavyBody {
+  0%   { transform: rotate(6deg) translateX(-2px); }
+  38%  { transform: rotate(11deg) translateX(-4px); }
+  58%  { transform: rotate(-14deg) translateX(5px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+@keyframes heavyArm {
+  0%   { transform: rotate(-120deg); }
+  46%  { transform: rotate(-152deg); }
+  62%  { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes flashPop {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes burstRing {
+  0%   { transform: scale(0.3); opacity: 1; }
+  100% { transform: scale(4.2); opacity: 0; }
+}
+@keyframes warpStreak {
+  0%   { transform: scaleY(1.6) scaleX(0.6); opacity: 1; }
+  70%  { opacity: 0.85; }
+  100% { transform: scaleY(0.4) scaleX(1.4); opacity: 0; }
+}
+@keyframes crackFade {
+  0%   { transform: scale(0.4); opacity: 0; }
+  18%  { transform: scale(1.05); opacity: 1; }
+  70%  { opacity: 0.9; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes auraFlame {
+  0%   { transform: translateX(-50%) scaleY(0.9) scaleX(0.92); opacity: 0.55; }
+  100% { transform: translateX(-50%) scaleY(1.14) scaleX(1.04); opacity: 0.95; }
+}
+
+@keyframes fadeGlitch {
+  0% { opacity: 0; transform: scale(0.97) translateY(10px); filter: blur(2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+.landing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  text-align: center;
+  gap: 1.2rem;
+}
+
+.avatar-frame {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 3px solid #00d4ff;
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.2), inset 0 0 60px rgba(0, 212, 255, 0.05);
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: 0.3s;
+}
+
+.avatar-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.glitch-text {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.glitch-text .cj {
+  color: #00d4ff;
+  text-shadow: 0 0 30px #00d4ff, 0 0 60px #00d4ff44;
+}
+
+.glitch-text .avascript {
+  color: #ff0080;
+  text-shadow: 0 0 30px #ff0080, 0 0 60px #ff008044;
+}
+
+.landing-content .subtitle {
+  font-size: 1.3rem;
+  color: #7ec8e0;
+  letter-spacing: 2px;
+  background: rgba(0, 212, 255, 0.05);
+  padding: 0.4rem 2rem;
+  border-radius: 40px;
+  border: 1px solid #00d4ff44;
+}
+
+.landing-content .subtitle i {
+  color: #ff0080;
+  margin-right: 10px;
+}
+
+.landing-content .cta-text {
+  color: #8fb0c9;
+  font-size: 1rem;
+  max-width: 500px;
+  line-height: 1.8;
+}
+
+.about-minimal {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 2.8rem;
+  align-items: start;
+}
+
+.about-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.avatar-frame-small {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 3px solid #ff0080;
+  box-shadow: 0 0 40px #ff008044, inset 0 0 40px #ff008022;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.avatar-frame-small:hover {
+  transform: scale(1.05);
+  border-color: #00d4ff;
+  box-shadow: 0 0 60px #00d4ff44;
+}
+
+.avatar-frame-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.about-text h2 {
+  color: #00d4ff;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 0 15px #00d4ff55;
+  border-left: 6px solid #ff0080;
+  padding-left: 1rem;
+  margin-bottom: 0;
+}
+
+.about-buttons-horizontal {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.about-btn {
+  background: rgba(18, 18, 31, 0.8);
+  border: 1px solid #00d4ff44;
+  color: #b0dcec;
+  padding: 0.5rem 1.2rem;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.about-btn i {
+  color: #00d4ff;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.about-btn:hover {
+  background: #00d4ff22;
+  border-color: #ff0080aa;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px #ff008033;
+}
+
+.about-btn.active {
+  background: #ff008018;
+  border-color: #ff0080;
+  color: #ff0080;
+  box-shadow: 0 0 25px #ff008033;
+}
+
+.about-btn.active i {
+  color: #ff0080;
+}
+
+.about-text .role {
+  color: #ff0080;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.about-text .role i {
+  color: #00d4ff;
+  font-size: 1.1rem;
+}
+
+.about-text p {
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #c8dce8;
+  max-width: 600px;
+}
+
+.about-text .exp-tag {
+  margin-top: 1.5rem;
+  display: inline-block;
+  background: #12121f;
+  padding: 0.4rem 1.6rem;
+  border-radius: 40px;
+  border: 1px solid #ff008066;
+  color: #ff8abf;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+.about-text .exp-tag i {
+  color: #00d4ff;
+  margin-right: 8px;
+}
+
+.page-content.with-buttons .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.page-content.with-buttons .page-title {
+  flex: 1;
+}
+
+.page-content.with-buttons .page-title h2 {
+  color: #00d4ff;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 20px #00d4ff44;
+}
+
+.page-content.with-buttons .page-title .page-subtitle {
+  color: #8fb0c9;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  margin-bottom: 0;
+}
+
+.page-buttons-horizontal {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.skill-tag {
+  background: #0f0f1a;
+  padding: 0.6rem 1.8rem;
+  border-radius: 40px;
+  border: 1px solid #00d4ff44;
+  color: #b0dcec;
+  font-size: 1rem;
+  transition: 0.3s;
+  cursor: default;
+}
+
+.skill-tag:hover {
+  border-color: #ff0080;
+  background: #ff008018;
+  transform: scale(1.05);
+  box-shadow: 0 0 30px #ff008022;
+}
+
+.achievement-list, .goal-list {
+  list-style: none;
+  padding: 0;
+}
+
+.achievement-list li, .goal-list li {
+  padding: 0.8rem 0;
+  color: #c8dce8;
+  font-size: 1.05rem;
+  border-bottom: 1px solid #1a1a2e44;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.achievement-list li i, .goal-list li i {
+  font-size: 1.2rem;
+  width: 1.8rem;
+  color: #00d4ff;
+}
+
+.achievement-list li i.fa-award,
+.achievement-list li i.fa-trophy {
+  color: #ff0080;
+}
+
+.achievement-list li i.fa-medal {
+  color: #ffd700;
+}
+
+.achievement-list li i.fa-code {
+  color: #00d4ff;
+}
+
+.achievement-list li i.fa-star {
+  color: #ff0080;
+}
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.contact-item {
+  background: #0f0f1a;
+  padding: 1.2rem 2rem;
+  border-radius: 60px;
+  border: 1px solid #ff008044;
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.05), transparent);
+  transition: 0.6s;
+}
+
+.contact-item:hover::before {
+  left: 100%;
+}
+
+.contact-item:hover {
+  border-color: #00d4ff;
+  box-shadow: 0 0 30px #00d4ff22;
+  transform: translateX(8px);
+}
+
+.contact-item i {
+  font-size: 2rem;
+  width: 3rem;
+  color: #00d4ff;
+  text-shadow: 0 0 20px #00d4ff88;
+}
+
+.contact-item span {
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.contact-item small {
+  color: #7f9bb0;
+  margin-left: auto;
+  font-size: 0.9rem;
+  background: #1a1a2e;
+  padding: 0.2rem 1.2rem;
+  border-radius: 40px;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+}
+
+.blog-item {
+  background: #0f0f1a;
+  border-radius: 28px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border: 1px solid #1a1a2e;
+  transition: 0.3s;
+  box-shadow: 0 10px 20px -8px #00000066;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.blog-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #00d4ff, #ff0080);
+  transform: scaleX(0);
+  transition: 0.4s;
+}
+
+.blog-item:hover::after {
+  transform: scaleX(1);
+}
+
+.blog-item:hover {
+  border-color: #ff0080;
+  transform: translateY(-3px);
+  box-shadow: 0 0 50px #ff008022;
+  z-index: 2;
+}
+
+.blog-item i {
+  font-size: 3.2rem;
+  color: #00d4ff;
+  text-shadow: 0 0 30px #00d4ff66;
+  margin-bottom: 1rem;
+  transition: 0.3s;
+}
+
+.blog-item:hover i {
+  color: #ff0080;
+  text-shadow: 0 0 40px #ff008088;
+  transform: scale(1.1);
+}
+
+.blog-item h4 {
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  color: #d4ecff;
+  margin-bottom: 0.6rem;
+}
+
+.blog-item p {
+  color: #8fb0c9;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.blog-item .badge {
+  display: inline-block;
+  background: #ff008018;
+  padding: 0.25rem 1.4rem;
+  border-radius: 40px;
+  border: 1px solid #ff008066;
+  font-size: 0.8rem;
+  color: #ff8abf;
+}
+
+.game-card {
+  cursor: pointer;
+  border-color: #00d4ff44;
+}
+
+.game-card:hover {
+  border-color: #00d4ff;
+  box-shadow: 0 0 50px #00d4ff22;
+}
+
+.game-card:hover i {
+  color: #00d4ff;
+  text-shadow: 0 0 40px #00d4ff88;
+}
+
+.game-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.game-modal.active {
+  display: flex;
+  animation: fadeGlitch 0.3s ease;
+}
+
+.game-window {
+  background: #0d0d1a;
+  border: 2px solid #00d4ff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 780px;
+  box-shadow: 0 0 60px #00d4ff33, inset 0 0 30px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.courier-window {
+  max-width: 780px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: #12121f;
+  border-bottom: 2px solid #ff0080;
+  color: #00d4ff;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+.game-header i {
+  margin-right: 8px;
+  color: #ff0080;
+}
+
+.game-close {
+  background: transparent;
+  border: 1px solid #ff008055;
+  color: #ff0080;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.game-close:hover {
+  background: #ff008022;
+  border-color: #ff0080;
+  transform: rotate(90deg);
+}
+
+.game-body {
+  padding: 1rem;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  background: #05050c;
+  border: 2px solid #00d4ff44;
+  border-radius: 14px;
+  margin-bottom: 0.8rem;
+  image-rendering: pixelated;
+  box-shadow: 0 0 30px #00d4ff22, inset 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.game-stats {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  color: #7ec8e0;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.8rem;
+  padding: 0.5rem 1rem;
+  background: #0f0f1a;
+  border-radius: 12px;
+  border: 1px solid #1a1a2e;
+}
+
+.game-stats span {
+  color: #00d4ff;
+  font-weight: 600;
+}
+
+#traceBar {
+  color: #ff0080;
+}
+
+#parGoal {
+  color: #ffd700;
+}
+
+#creditBar {
+  color: #00d4ff;
+}
+
+#speedBar {
+  color: #ff0080;
+  letter-spacing: 0;
+}
+
+.game-message {
+  color: #8fb0c9;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  background: #0f0f1a;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #1a1a2e;
+  margin-bottom: 0.8rem;
+  font-family: 'Courier New', monospace;
+}
+
+.game-controls {
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+.move-hint {
+  color: #7ec8e0;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.move-hint i {
+  color: #00d4ff;
+  margin: 0 3px;
+  font-size: 0.7rem;
+}
+
+.game-footer {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.game-sound-btn {
+  background: rgba(18, 18, 31, 0.9);
+  border: 2px solid #1a1a2e;
+  color: #7ec8e0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.25s;
+}
+
+.game-sound-btn:hover {
+  border-color: #00d4ff;
+  color: #00d4ff;
+  box-shadow: 0 0 20px #00d4ff33;
+}
+
+.game-sound-btn.muted {
+  color: #ff0080;
+  border-color: #ff0080;
+}
+
+.game-start-btn {
+  background: rgba(18, 18, 31, 0.9);
+  border: 2px solid #00d4ff;
+  color: #00d4ff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: 0.25s;
+  box-shadow: 0 0 20px #00d4ff33;
+}
+
+.game-start-btn:hover {
+  background: #00d4ff22;
+  border-color: #ff0080;
+  color: #ff0080;
+  box-shadow: 0 0 35px #ff008033;
+  transform: translateY(-2px);
+}
+
+.game-start-btn i {
+  margin-right: 6px;
+}
+
+@media (max-width: 760px) {
+  .static-header { flex-direction: column; align-items: start; gap: 0.8rem; }
+  .about-minimal { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .about-header { flex-direction: column; align-items: center; }
+  .about-buttons-horizontal { justify-content: center; }
+  .about-text h2 { border-left: none; padding-left: 0; border-bottom: 3px solid #ff0080; padding-bottom: 0.5rem; }
+  .about-text .role { justify-content: center; }
+  .dashboard-nav { gap: 0.4rem; padding: 0.6rem 0.8rem; }
+  .dash-btn { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+  .dash-btn i { font-size: 0.85rem; }
+  .contact-item { flex-wrap: wrap; gap: 0.6rem; }
+  .contact-item small { margin-left: 0; }
+  .avatar-frame-small { width: 140px; height: 140px; }
+  .glitch-text { font-size: 2.5rem; }
+  .avatar-frame { width: 130px; height: 130px; }
+  .page-content.with-buttons .page-header { flex-direction: column; align-items: center; text-align: center; }
+  .page-buttons-horizontal { justify-content: center; }
+  .sprite { width: 30px; height: 42px; }
+}
