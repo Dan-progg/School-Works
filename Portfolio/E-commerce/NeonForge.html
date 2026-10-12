@@ -6,7 +6,7 @@
     <title>NEON FORGE · PC Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="NF.css?v=2">
+    <link rel="stylesheet" href="NF.css?v=3">
 </head>
 <body>
     <div class="cyber-card">
@@ -87,6 +87,13 @@
                         <p id="checkout-email">—</p>
                         <p id="checkout-phone">—</p>
                     </div>
+                    <div class="location-input-row">
+                        <input type="text" id="deliver-location" placeholder="Delivery location (address or GPS pin)">
+                        <button type="button" class="use-location-btn" id="use-location-btn" title="Use my location" aria-label="Use my location">
+                            <i class="fas fa-location-crosshairs"></i>
+                        </button>
+                    </div>
+                    <span class="location-status" id="location-status"></span>
                 </div>
 
                 <div class="form-section">
@@ -152,6 +159,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="NF.js?v=2"></script>
+    <script src="NF.js?v=3"></script>
 </body>
 </html>

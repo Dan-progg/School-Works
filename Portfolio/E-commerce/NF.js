@@ -266,6 +266,89 @@ function closePaymentModal() {
     document.getElementById('payment-modal').classList.remove('active');
 }
 
+let capturedLocation = null;
+
+function setLocationStatus(message, isError = false) {
+    const status = document.getElementById('location-status');
+    if (!status) return;
+    status.textContent = message;
+    status.classList.toggle('error', isError);
+}
+
+async function reverseGeocode(latitude, longitude) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    try {
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
+            { headers: { 'Accept': 'application/json' }, signal: controller.signal }
+        );
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.display_name || null;
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function useMyLocation() {
+    const input = document.getElementById('deliver-location');
+    const btn = document.getElementById('use-location-btn');
+
+    if (!navigator.geolocation) {
+        setLocationStatus('Geolocation is not supported by this browser.', true);
+        return;
+    }
+
+    btn.disabled = true;
+    const originalIcon = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    setLocationStatus('Requesting location permission…');
+
+    navigator.geolocation.getCurrentPosition(
+        async function (position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            capturedLocation = {
+                latitude,
+                longitude,
+                maps_url: `https://www.google.com/maps?q=${latitude},${longitude}`
+            };
+
+            input.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+            setLocationStatus('Location captured. Looking up address…');
+
+            try {
+                const address = await reverseGeocode(latitude, longitude);
+                if (address) {
+                    capturedLocation.address = address;
+                    input.value = address;
+                    setLocationStatus('Location captured.');
+                } else {
+                    setLocationStatus('Location captured (coordinates).');
+                }
+            } catch (err) {
+                setLocationStatus('Location captured (coordinates).');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = originalIcon;
+        },
+        function (error) {
+            let message = 'Unable to get your location.';
+            if (error.code === error.PERMISSION_DENIED) message = 'Location permission denied.';
+            else if (error.code === error.POSITION_UNAVAILABLE) message = 'Location information is unavailable.';
+            else if (error.code === error.TIMEOUT) message = 'Location request timed out.';
+            setLocationStatus(message, true);
+            btn.disabled = false;
+            btn.innerHTML = originalIcon;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+}
+
+document.getElementById('use-location-btn')?.addEventListener('click', useMyLocation);
+
 document.addEventListener('change', function(e) {
     if (e.target.name === 'payment') {
         document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
@@ -347,6 +430,14 @@ document.getElementById('payment-form')?.addEventListener('submit', async functi
         };
     }
 
+    const locationText = document.getElementById('deliver-location')?.value.trim();
+    if (locationText) {
+        paymentDetails.location = {
+            text: locationText,
+            ...(capturedLocation || {})
+        };
+    }
+
     const orderData = {
         receipt_no: receiptNo,
         session_id: `user_${currentUser.id}`,
@@ -414,6 +505,8 @@ document.getElementById('payment-form')?.addEventListener('submit', async functi
         document.querySelector('.payment-option').classList.add('active');
         document.getElementById('card-details').style.display = 'none';
         document.getElementById('cod-address').style.display = 'none';
+        capturedLocation = null;
+        setLocationStatus('');
 
     } catch (err) {
         console.error('Order error:', err);
@@ -435,6 +528,18 @@ function showReceipt(order) {
         year: 'numeric', month: 'short', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
     });
+    let locationHtml = '';
+    const pinned = order.payment_details?.location;
+    if (pinned && (pinned.text || pinned.address)) {
+        const label = pinned.address || pinned.text;
+        locationHtml = `
+            <div class="receipt-address">
+                <span>DELIVERY LOCATION</span>
+                <p>${label}</p>
+                ${pinned.maps_url ? `<p><a href="${pinned.maps_url}" target="_blank" rel="noopener">View pinned location on Google Maps</a></p>` : ''}
+            </div>
+        `;
+    }
     let addressHtml = '';
     if (order.payment_method === 'Cash on Delivery' && order.payment_details?.delivery_address) {
         const a = order.payment_details.delivery_address;
@@ -464,6 +569,7 @@ function showReceipt(order) {
             <div><span>Payment</span><strong>${order.payment_method}</strong></div>
             <div><span>Status</span><strong style="color:${order.status === 'paid' ? '#27ae60' : '#e67e22'};">${order.status.toUpperCase()}</strong></div>
         </div>
+        ${locationHtml}
         ${addressHtml}
         <table class="receipt-items-table">
             <thead><tr><th>Item</th><th>Amount</th></tr></thead>
