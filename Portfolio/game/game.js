@@ -304,6 +304,7 @@
     elapsedTime = 0;
     lastTime = performance.now();
     gameMessage.classList.add('game-hidden');
+    console.log(`[Game] Starting level ${currentLevel}, speedStage: ${speedStage}`);
     gameMessage.innerHTML = `> <span style="color:#00d4ff;">LEVEL ${currentLevel}/10</span> · SPEED <span style="color:#ff0080;">${'★'.repeat(speedStage)}${'☆'.repeat(5 - speedStage)}</span> · <span style="color:#a06bff;">♪ ${Audio.trackName ? Audio.trackName() : ''}</span><br>> GO! GRAB THE <span style="color:#ff0080;">PACKAGE</span> AND REACH THE <span style="color:#00d4ff;">DROP ZONE</span>.` +
       (enemies.length ? ` <span style="color:#ff4d4d;">⚠ ${enemies.length} TURRET${enemies.length > 1 ? 'S' : ''} ACTIVE — DODGE THE RED FIRE!</span>` : '');
     gameStartBtn.innerHTML = '<i class="fas fa-play"></i> RESTART';
@@ -1056,5 +1057,8 @@
   console.log('%c🎮 Neon Courier — 10 Levels of cyberpunk delivery chaos', 'color: #ff0080; font-size: 12px;');
 
   // expose the game's active flag (used by the audio dock)
-  CJ.game = { isActive: function () { return gameActive; } };
+  CJ.game = {
+    isActive: function () { return gameActive; },
+    get currentStage() { return speedStage; }
+  };
 })();
