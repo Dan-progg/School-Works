@@ -14,6 +14,7 @@
     achievements: document.getElementById('achievements'),
     goals: document.getElementById('goals'),
     contact: document.getElementById('contact'),
+    theme: document.getElementById('theme'),
     portfolio: document.getElementById('portfolio')
   };
 
@@ -141,7 +142,8 @@
       '1': 'landing',
       '2': 'about',
       '3': 'contact',
-      '4': 'portfolio'
+      '4': 'features',
+      '5': 'portfolio'
     };
     if (key in pageMap) {
       e.preventDefault();

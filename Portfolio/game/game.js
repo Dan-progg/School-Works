@@ -290,6 +290,7 @@
     loadLevel(currentLevel);
     updateHUD();
     drawScene();
+    gameMessage.classList.remove('game-hidden');
     gameMessage.innerHTML = '> READY.<br>> ' + '<span style="color:#00d4ff;">← → / A D</span> RUN · <span style="color:#00d4ff;">SPACE / W / ↑</span> JUMP (DOUBLE-JUMP IN AIR) · <span style="color:#00d4ff;">R</span> RESTART.<br>> GRAB THE <span style="color:#ff0080;">PACKAGE</span>, REACH THE <span style="color:#00d4ff;">DROP ZONE</span>, AND TOUCH <span style="color:#00d4ff;">CHECKPOINT FLAGS</span> TO SAVE PROGRESS.<br>> FROM <span style="color:#ff4d4d;">LEVEL 5</span>, SECURITY TURRETS FIRE AT YOU — DODGE THEM!<br>> RUN SPEED RISES EVERY 2 LEVELS (<span style="color:#ff0080;">★☆☆☆☆ → ★★★★★</span>), EACH STAGE WITH ITS OWN TRACK. BEAT PAR FOR A <span style="color:#ffd700;">GOLD</span> MEDAL!';
     gameStartBtn.innerHTML = '<i class="fas fa-play"></i> START RUN';
   }
@@ -302,6 +303,7 @@
     gameActive = true;
     elapsedTime = 0;
     lastTime = performance.now();
+    gameMessage.classList.add('game-hidden');
     gameMessage.innerHTML = `> <span style="color:#00d4ff;">LEVEL ${currentLevel}/10</span> · SPEED <span style="color:#ff0080;">${'★'.repeat(speedStage)}${'☆'.repeat(5 - speedStage)}</span> · <span style="color:#a06bff;">♪ ${Audio.trackName ? Audio.trackName() : ''}</span><br>> GO! GRAB THE <span style="color:#ff0080;">PACKAGE</span> AND REACH THE <span style="color:#00d4ff;">DROP ZONE</span>.` +
       (enemies.length ? ` <span style="color:#ff4d4d;">⚠ ${enemies.length} TURRET${enemies.length > 1 ? 'S' : ''} ACTIVE — DODGE THE RED FIRE!</span>` : '');
     gameStartBtn.innerHTML = '<i class="fas fa-play"></i> RESTART';
@@ -650,6 +652,7 @@
   function endRun(reason) {
     gameActive = false;
     cancelAnimationFrame(animId);
+    gameMessage.classList.remove('game-hidden');
 
     if (reason === 'success') {
       const bonus = Math.max(50, Math.round(3000 / Math.max(elapsedTime, 0.5)));
@@ -964,6 +967,7 @@
     gameModal.classList.add('active');
     currentLevel = 1;
     resetGame();
+    gameMessage.classList.add('game-hidden'); // Hide instructions initially so canvas is visible
   });
 
   gameClose.addEventListener('click', function() {
@@ -974,6 +978,7 @@
     cancelAnimationFrame(animId);
     clearTimeout(autoRetryTimeout);
     stopMusic();
+    gameMessage.classList.remove('game-hidden');
   });
 
   gameModal.addEventListener('click', function(e) {
@@ -985,6 +990,7 @@
       cancelAnimationFrame(animId);
       clearTimeout(autoRetryTimeout);
       stopMusic();
+      gameMessage.classList.remove('game-hidden');
     }
   });
 
@@ -1033,6 +1039,7 @@
       cancelAnimationFrame(animId);
       clearTimeout(autoRetryTimeout);
       stopMusic();
+      gameMessage.classList.remove('game-hidden');
     }
   });
 
