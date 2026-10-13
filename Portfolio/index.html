@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NEON · CJavascript</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=28">
+  <link rel="stylesheet" href="portfolio/portfolio.css?v=46">
+  <link rel="stylesheet" href="game/game.css?v=46">
+  <link rel="stylesheet" href="audio/audio.css?v=46">
 </head>
 <body>
   <!-- 2D fighter sprite template: human + cyborg variants (cloned twice per page arena by script.js) -->
@@ -71,6 +73,9 @@
         <rect class="torso" x="12" y="16.6" width="12" height="14.6" rx="3.2"/>
         <rect class="chest" x="15.8" y="19.4" width="4.4" height="4.6" rx="0.8"/>
         <rect class="core" x="17.4" y="20.9" width="1.2" height="1.6" rx="0.3"/>
+        <!-- Zan-only: a loose red scarf/cord knotted at the neck (hidden on the cyborg) -->
+        <path class="scarf" d="M12.3 15.2 Q18 18.6 23.7 15.2 L23.7 17.8 Q18 21 12.3 17.8 Z"/>
+        <path class="scarf-tail" d="M22.3 16.4 L25.9 24.8 L23.3 25.3 L20.7 17.7 Z"/>
         <rect class="belt" x="12" y="28.8" width="12" height="3" rx="0.8"/>
         <g class="head">
           <!-- human face -->
@@ -82,6 +87,14 @@
             <path class="band-tail" d="M12.7 8.5 L7.4 12.2 L12 10.7 Z"/>
             <rect class="eye" x="15.1" y="10.3" width="2" height="1.8" rx="0.4"/>
             <rect class="eye" x="18.9" y="10.3" width="2" height="1.8" rx="0.4"/>
+            <!-- Zan-only: a wide frayed straw kasa casts the face into shadow, a dark
+                 cloth mask covers the lower half, with a faint red glint beneath it -->
+            <path class="kasa" d="M3.2 8.6 L18 1.2 L32.8 8.6 Z"/>
+            <ellipse class="kasa-brim" cx="18" cy="8.6" rx="14.8" ry="1.7"/>
+            <rect class="face-shadow" x="12.3" y="5.2" width="11.4" height="5" rx="0.9"/>
+            <rect class="eye-glint" x="14.9" y="8.2" width="2" height="1.6" rx="0.6"/>
+            <rect class="eye-glint" x="19.1" y="8.2" width="2" height="1.6" rx="0.6"/>
+            <rect class="mask" x="13" y="9.8" width="10" height="4.8" rx="1.3"/>
             <!-- three-sword style: katana clenched in the mouth (shown during Onigiri) -->
             <g class="oni-blade oni-mouth">
               <line class="oni-steel" x1="18.4" y1="13.2" x2="31" y2="10.4"/>
@@ -251,9 +264,9 @@
       <div id="contact" class="page">
         <div class="contact-list">
           <div class="contact-item"><i class="fas fa-envelope"></i><span>sandovaldan26@gmail.com</span><small>primary</small></div>
-          <div class="contact-item"><i class="fab fa-github"></i><span>github.com/Dan-progg</span><small>repos</small></div>
-          <div class="contact-item"><i class="fab fa-discord"></i><span>Philo#6588</span><small>discord</small></div>
-          <div class="contact-item"><i class="fab fa-instagram"></i><span>@cjoodid.nothin</span><small>instagram</small></div>
+          <div class="contact-item"><i class="fab fa-github"></i><span><a href="https://github.com/Dan-progg" target="_blank">github.com/Dan-progg</a></span><small>repos</small></div>
+          <div class="contact-item"><i class="fab fa-discord"></i><span><a href="https://discord.com/users/956418123286843432" target="_blank">Philo#6588</a></span><small>discord</small></div>
+          <div class="contact-item"><i class="fab fa-instagram"></i><span><a href="https://instagram.com/cjoodid.nothin" target="_blank">@cjoodid.nothin</a></span><small>instagram</small></div>
           <div class="contact-item"><i class="fas fa-phone"></i><span>+63 919 3929 440</span><small>encrypted</small></div>
         </div>
         <div class="arena" aria-hidden="true"></div>
@@ -317,6 +330,21 @@
     </div>
   </div>
 
-  <script src="script.js?v=28"></script>
+  <!-- Always-visible audio controls: portfolio BGM + fight SFX -->
+  <div class="audio-dock" id="audioDock">
+    <div class="audio-row">
+      <span class="audio-label">BGM</span>
+      <input type="range" id="bgmVolume" class="audio-slider" min="0" max="1" step="0.01" value="0.1" title="BGM volume">
+    </div>
+    <div style="display:flex; gap:0.5rem">
+      <button class="audio-btn" id="bgmToggle" title="Toggle background music" aria-label="Toggle background music"><i class="fas fa-music"></i></button>
+    </div>
+  </div>
+
+  <!-- Modular scripts: shared audio first, then the fighter, the game, and the page shell -->
+  <script src="audio/audio.js?v=46"></script>
+  <script src="fighter/fighter.js?v=46"></script>
+  <script src="game/game.js?v=46"></script>
+  <script src="portfolio/portfolio.js?v=46"></script>
 </body>
 </html>
