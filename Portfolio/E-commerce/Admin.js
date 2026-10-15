@@ -6,6 +6,24 @@ let allOrders = [];
 let allProducts = [];
 let allCustomers = [];
 
+function formatPHTime(isoString) {
+    if (!isoString) return '—';
+    return new Date(isoString).toLocaleString('en-PH', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+        hour12: true
+    });
+}
+
+function formatPHDate(isoString) {
+    if (!isoString) return '—';
+    return new Date(isoString).toLocaleDateString('en-PH', {
+        timeZone: 'Asia/Manila',
+        month: 'short', day: 'numeric', year: 'numeric'
+    });
+}
+
 function checkAuth() {
     const admin = sessionStorage.getItem('neonForgeAdmin');
     if (!admin) {
@@ -173,22 +191,28 @@ function renderOrders(filter = '') {
         return;
     }
     tbody.innerHTML = filtered.map(order => {
-        const date = new Date(order.created_at).toLocaleDateString('en-PH', {
-            month: 'short', day: 'numeric', year: 'numeric'
-        });
+        const date = formatPHDate(order.created_at);
         const itemCount = Array.isArray(order.items)
             ? order.items.reduce((s, i) => s + (Number(i.quantity) || 0), 0) : 0;
         const badgeClass = order.status === 'paid' ? 'badge-paid' : 'badge-pending';
+        const statusOptions = ['pending', 'paid', 'shipped', 'delivered', 'cancelled']
+            .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`)
+            .join('');
         return `
-            <tr>
+            <tr data-receipt="${order.receipt_no}">
                 <td class="receipt-cell">${order.receipt_no}</td>
                 <td>${date}</td>
                 <td>${order.customer_name || '—'}<br><small style="color:#7ec8e0;font-size:0.7rem;">${order.customer_email || ''}</small></td>
                 <td>${order.payment_method || '—'}</td>
                 <td>${itemCount} item${itemCount !== 1 ? 's' : ''}</td>
                 <td class="price-cell">₱${Number(order.total).toLocaleString()}</td>
-                <td><span class="badge ${badgeClass}">${order.status}</span></td>
-                <td><button class="action-btn" onclick="viewOrderDetail('${order.receipt_no}')"><i class="fas fa-eye"></i> View</button></td>
+                <td><span class="badge ${badgeClass}" id="badge-${order.receipt_no}">${order.status}</span></td>
+                <td>
+                    <select class="status-select" data-receipt="${order.receipt_no}" data-old="${order.status}" onchange="updateOrderStatus(this)">
+                        ${statusOptions}
+                    </select>
+                    <button class="action-btn" onclick="viewOrderDetail('${order.receipt_no}')"><i class="fas fa-eye"></i> View</button>
+                </td>
             </tr>
         `;
     }).join('');
@@ -230,9 +254,7 @@ function renderCustomers(filter = '') {
         return;
     }
     tbody.innerHTML = filtered.map(c => {
-        const lastDate = new Date(c.lastOrder).toLocaleDateString('en-PH', {
-            month: 'short', day: 'numeric', year: 'numeric'
-        });
+        const lastDate = formatPHDate(c.lastOrder);
         return `
             <tr>
                 <td><strong>${c.name || '—'}</strong></td>
@@ -345,10 +367,7 @@ async function saveEditProduct(e) {
 function viewOrderDetail(receiptNo) {
     const order = allOrders.find(o => o.receipt_no === receiptNo);
     if (!order) return;
-    const date = new Date(order.created_at).toLocaleString('en-PH', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-    });
+    const date = formatPHTime(order.created_at);
     const itemsHtml = Array.isArray(order.items) ? order.items.map(item => `
         <div class="detail-item-row">
             <span>${item.productname} × ${item.quantity}</span>
@@ -401,6 +420,46 @@ document.getElementById('order-search')?.addEventListener('input', function() {
 document.getElementById('order-status-filter')?.addEventListener('change', function() {
     renderOrders(document.getElementById('order-search').value);
 });
+
+async function updateOrderStatus(selectEl) {
+    const receiptNo = selectEl.dataset.receipt;
+    const oldStatus = selectEl.dataset.old;
+    const newStatus = selectEl.value;
+
+    if (newStatus === oldStatus) return;
+
+    selectEl.disabled = true;
+
+    try {
+        const { error } = await supabaseClient
+            .from('orders')
+            .update({ status: newStatus })
+            .eq('receipt_no', receiptNo);
+        if (error) throw error;
+
+        // Update local state
+        const order = allOrders.find(o => o.receipt_no === receiptNo);
+        if (order) order.status = newStatus;
+
+        // Update badge
+        const badgeEl = document.getElementById(`badge-${receiptNo}`);
+        if (badgeEl) {
+            badgeEl.textContent = newStatus;
+            badgeEl.className = `badge ${newStatus === 'paid' || newStatus === 'delivered' ? 'badge-paid' : newStatus === 'cancelled' ? 'badge-low' : 'badge-pending'}`;
+        }
+
+        selectEl.dataset.old = newStatus;
+
+        // Refresh overview stats if needed
+        renderOverview();
+    } catch (err) {
+        console.error('Error updating order status:', err);
+        alert('Failed to update status. Please try again.');
+        selectEl.value = oldStatus;
+    } finally {
+        selectEl.disabled = false;
+    }
+}
 document.getElementById('customer-search')?.addEventListener('input', function() {
     renderCustomers(this.value);
 });
@@ -417,8 +476,10 @@ function updateClock() {
     if (!el) return;
     const now = new Date();
     el.textContent = now.toLocaleString('en-PH', {
+        timeZone: 'Asia/Manila',
         weekday: 'short', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit'
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: true
     });
 }
 setInterval(updateClock, 1000);

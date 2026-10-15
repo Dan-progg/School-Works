@@ -734,6 +734,36 @@ body {
     color: var(--bg-dark);
 }
 
+.status-select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-right: 0.5rem;
+    min-width: 120px;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.status-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.status-select option {
+    background: var(--bg-elevated);
+    color: var(--text-main);
+}
+
 .table-empty {
     text-align: center;
     padding: 3rem 1rem;

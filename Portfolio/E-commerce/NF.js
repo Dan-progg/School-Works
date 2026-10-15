@@ -452,8 +452,8 @@ document.getElementById('payment-form')?.addEventListener('submit', async functi
         tax: tax,
         shipping: shipping,
         total: total,
-        status: method === 'Cash on Delivery' ? 'pending' : 'paid',
-        created_at: new Date().toISOString()
+        status: method === 'Cash on Delivery' ? 'pending' : 'paid'
+        // created_at: let database handle with DEFAULT now() (timestamptz)
     };
 
     const payBtn = document.querySelector('.pay-now-btn');
@@ -517,6 +517,24 @@ document.getElementById('payment-form')?.addEventListener('submit', async functi
     }
 });
 
+function formatPHTime(isoString) {
+    if (!isoString) return '—';
+    return new Date(isoString).toLocaleString('en-PH', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+        hour12: true
+    });
+}
+
+function formatPHDate(isoString) {
+    if (!isoString) return '—';
+    return new Date(isoString).toLocaleDateString('en-PH', {
+        timeZone: 'Asia/Manila',
+        month: 'short', day: 'numeric', year: 'numeric'
+    });
+}
+
 function showReceipt(order) {
     const itemsHtml = order.items.map(item => `
         <tr>
@@ -524,10 +542,7 @@ function showReceipt(order) {
             <td>₱${(item.productprice * item.quantity).toLocaleString()}</td>
         </tr>
     `).join('');
-    const date = new Date(order.created_at).toLocaleString('en-PH', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-    });
+    const date = formatPHTime(order.created_at);
     let locationHtml = '';
     const pinned = order.payment_details?.location;
     if (pinned && (pinned.text || pinned.address)) {
